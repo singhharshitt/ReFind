@@ -1,0 +1,55 @@
+# Dependencies and virtual environments
+client/node_modules/
+server/venv/
+server/.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Frontend build and tool output
+client/dist/
+client/dist-ssr/
+client/.vite/
+client/coverage/
+
+# Backend build and test output
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Environment files and local configuration
+.env
+.env.*
+!.env.example
+*.local
+
+# Runtime data and generated files
+*.sqlite3
+*.sqlite3-journal
+server/media/
+server/staticfiles/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor and operating-system files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
