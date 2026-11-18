@@ -1,0 +1,7 @@
+<div class="listing-grid">
+    {% for listing in listings %}
+        {% include "listings/partials/listing_card.html" with listing=listing %}
+    {% empty %}
+        <p class="empty-state">No listings match your search.</p>
+    {% endfor %}
+</div>

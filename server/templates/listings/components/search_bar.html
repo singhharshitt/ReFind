@@ -1,0 +1,19 @@
+<div class="search-row">
+    <form class="search-box"
+          hx-get="{% url 'home' %}" hx-trigger="submit"
+          hx-target="#listing-grid" hx-push-url="true">
+        <i data-lucide="search"></i>
+        <input name="q" type="search" placeholder="Search for books, laptops, cycle, etc..."
+               aria-label="Search listings">
+        <button type="submit">Ctrl K</button>
+    </form>
+    <nav class="category-quick" aria-label="Popular categories">
+        <a href="#"><i data-lucide="layout-grid"></i><span>All Categories</span></a>
+        <a href="#"><i data-lucide="book-open"></i><span>Books</span></a>
+        <a href="#"><i data-lucide="laptop"></i><span>Electronics</span></a>
+        <a href="#"><i data-lucide="armchair"></i><span>Furniture</span></a>
+        <a href="#"><i data-lucide="dumbbell"></i><span>Sports</span></a>
+        <a href="#"><i data-lucide="shirt"></i><span>Essentials</span></a>
+        <a href="#"><span>•••</span><span>More</span></a>
+    </nav>
+</div>

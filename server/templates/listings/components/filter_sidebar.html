@@ -1,0 +1,39 @@
+<aside class="filters-panel">
+    <div class="filters-heading">
+        <strong><i data-lucide="list-filter"></i>Filters</strong>
+        <a href="{% url 'home' %}" hx-get="{% url 'home' %}" hx-target="#listing-grid">Clear all</a>
+    </div>
+    <form id="filters-form">
+        <fieldset>
+            <legend>Listing Type</legend>
+            <label><input type="checkbox" name="kind" value="sale"
+                          hx-get="{% url 'home' %}" hx-trigger="change"
+                          hx-target="#listing-grid" hx-include="#filters-form"> For Sale (129)</label>
+            <label><input type="checkbox" name="kind" value="exchange"
+                          hx-get="{% url 'home' %}" hx-trigger="change"
+                          hx-target="#listing-grid" hx-include="#filters-form"> For Exchange (34)</label>
+            <label><input type="checkbox" name="kind" value="donation"
+                          hx-get="{% url 'home' %}" hx-trigger="change"
+                          hx-target="#listing-grid" hx-include="#filters-form"> For Donation (20)</label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Price Range</legend>
+            <div class="price-range">
+                <div class="range-line"><span></span></div>
+                <div class="price-inputs">
+                    <input type="number" value="0" aria-label="Minimum price">
+                    <input type="number" value="50000" aria-label="Maximum price">
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Condition</legend>
+            <label><input type="checkbox"> Like New (46)</label>
+            <label><input type="checkbox"> Good (78)</label>
+            <label><input type="checkbox"> Fair (36)</label>
+            <label><input type="checkbox"> Used (7)</label>
+        </fieldset>
+    </form>
+</aside>
