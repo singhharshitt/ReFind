@@ -1,16 +1,9 @@
 # Dependencies and virtual environments
-client/node_modules/
 server/venv/
 server/.venv/
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Frontend build and tool output
-client/dist/
-client/dist-ssr/
-client/.vite/
-client/coverage/
 
 # Backend build and test output
 build/
