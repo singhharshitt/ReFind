@@ -1,0 +1,2 @@
+{% extends "listings/base.html" %}
+{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Your account</p><h1>Profile</h1><p>Keep your campus details up to date.</p></div><form class="listing-form" method="post">{% csrf_token %}{{ form.as_p }}<button class="primary-button" type="submit">Save profile</button></form><a class="text-button" href="{% url 'logout' %}">Log out</a></main>{% endblock %}

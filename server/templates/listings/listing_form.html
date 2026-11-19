@@ -1,0 +1,13 @@
+{% extends "listings/base.html" %}
+{% block title %}List an item · ReFind{% endblock %}
+{% block content %}
+    {% include "listings/components/header.html" %}
+    <main class="form-shell">
+        <div class="page-heading"><p class="eyebrow">Share with your campus</p><h1>List an item</h1><p>Give something useful a second life.</p></div>
+        <form class="listing-form" method="post">{% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}<label><span>{{ field.label }}</span>{{ field }}{% for error in field.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>{% endfor %}
+            <button class="primary-button" type="submit"><i data-lucide="plus"></i> Publish listing</button>
+        </form>
+    </main>
+{% endblock %}

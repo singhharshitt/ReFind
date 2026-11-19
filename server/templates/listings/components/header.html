@@ -13,16 +13,16 @@
         <a class="nav-link active" href="{% url 'home' %}">
             <i data-lucide="home"></i><span>Home</span>
         </a>
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'home' %}">
             <i data-lucide="layout-grid"></i><span>Listings</span>
         </a>
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'home' %}?kind=exchange">
             <i data-lucide="repeat-2"></i><span>Exchange</span>
         </a>
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'home' %}?kind=donation">
             <i data-lucide="heart"></i><span>Donate</span>
         </a>
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'inbox' %}">
             <i data-lucide="message-square"></i><span>Messages</span><b>3</b>
         </a>
     </nav>
@@ -30,10 +30,10 @@
         <button class="icon-button" type="button" aria-label="Notifications">
             <i data-lucide="bell"></i><span class="notification-dot"></span>
         </button>
-        <button class="profile-button" type="button">
-            <span class="profile-avatar">S</span>
-            <span>Sagar Sahu</span>
+        <a class="profile-button" href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'auth' %}{% endif %}">
+            <span class="profile-avatar">{% if user.is_authenticated %}{{ user.avatar_initials|default:"S" }}{% else %}S{% endif %}</span>
+            <span>{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Sign in{% endif %}</span>
             <i data-lucide="chevron-down"></i>
-        </button>
+        </a>
     </div>
 </header>

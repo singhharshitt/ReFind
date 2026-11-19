@@ -43,7 +43,7 @@
                 <h2>Create Your Account</h2>
                 <p>Register using your campus email</p>
             </div>
-            <form class="auth-form" data-form="register">
+            <form class="auth-form" method="post" action="{% url 'auth' %}" data-form="register">{% csrf_token %}<input type="hidden" name="action" value="register">
                 <label><span>Full Name</span><div class="auth-input"><i data-lucide="user-round"></i><input name="name" value="Sagar Sahu" required></div></label>
                 <label><span>Campus Email</span><div class="auth-input valid"><i data-lucide="mail"></i><input name="email" type="email" value="sagar.btechse@ipu.in" required><i data-lucide="circle-check"></i></div></label>
                 <label><span>Password</span><div class="auth-input"><i data-lucide="lock-keyhole"></i><input name="password" type="password" value="password" required><button type="button" class="password-toggle" aria-label="Show password"><i data-lucide="eye"></i></button></div></label>
@@ -58,9 +58,9 @@
                 <h2>Welcome Back</h2>
                 <p>Access your ReFind account</p>
             </div>
-            <form class="auth-form" data-form="login">
-                <label><span>Campus Email</span><div class="auth-input"><i data-lucide="mail"></i><input type="email" value="sagar.btechse@ipu.in" required></div></label>
-                <label><span>Password</span><div class="auth-input"><i data-lucide="lock-keyhole"></i><input type="password" value="password" required><button type="button" class="password-toggle" aria-label="Show password"><i data-lucide="eye"></i></button></div></label>
+            <form class="auth-form" method="post" action="{% url 'auth' %}" data-form="login">{% csrf_token %}<input type="hidden" name="action" value="login">
+                <label><span>Campus Email</span><div class="auth-input"><i data-lucide="mail"></i><input name="email" type="email" required></div></label>
+                <label><span>Password</span><div class="auth-input"><i data-lucide="lock-keyhole"></i><input name="password" type="password" required><button type="button" class="password-toggle" aria-label="Show password"><i data-lucide="eye"></i></button></div></label>
                 <div class="auth-options"><label class="remember"><input type="checkbox" checked> <span>Remember me</span></label><button type="button" class="auth-link">Forgot password?</button></div>
                 <button class="auth-primary" type="submit">Login <i data-lucide="arrow-right"></i></button>
             </form>
@@ -117,12 +117,6 @@
     };
     document.querySelectorAll('[data-go]').forEach((button) => {
         button.addEventListener('click', () => showPanel(button.dataset.go));
-    });
-    document.querySelectorAll('.auth-form').forEach((form) => {
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            showPanel(form.dataset.form === 'register' ? 'verify' : 'success');
-        });
     });
     document.querySelectorAll('.password-toggle').forEach((button) => {
         button.addEventListener('click', () => {

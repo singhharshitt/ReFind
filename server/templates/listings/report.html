@@ -1,0 +1,2 @@
+{% extends "listings/base.html" %}
+{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Keep ReFind safe</p><h1>Report listing</h1><p>{{ listing.title }}</p></div><form class="listing-form" method="post">{% csrf_token %}{{ form.as_p }}<button class="danger-button" type="submit">Submit report</button></form></main>{% endblock %}

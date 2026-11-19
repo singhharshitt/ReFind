@@ -1,0 +1,33 @@
+{% extends "listings/base.html" %}
+{% block title %}{{ listing.title }} · ReFind{% endblock %}
+{% block content %}
+    {% include "listings/components/header.html" %}
+    <main class="detail-shell">
+        <a class="back-link" href="{% url 'home' %}"><i data-lucide="arrow-left"></i> Back to listings</a>
+        <div class="detail-grid">
+            <div class="detail-image"><img src="{{ listing.image_url }}" alt="{{ listing.title }}"></div>
+            <section class="detail-copy">
+                <div class="detail-kicker">{{ listing.get_category_display }} · {{ listing.get_condition_display }}</div>
+                <h1>{{ listing.title }}</h1>
+                <div class="detail-price">{{ listing.price_label }}</div>
+                <p class="detail-description">{{ listing.description }}</p>
+                {% if listing.wanted_item_text %}<p class="exchange-note"><i data-lucide="repeat-2"></i> Looking for {{ listing.wanted_item_text }}</p>{% endif %}
+                <div class="detail-seller"><span class="seller-avatar">{{ listing.seller_initial }}</span><div><strong>{{ listing.seller }}</strong><span>Campus member · {{ listing.rating }} rating</span></div></div>
+                <div class="detail-actions">
+                    {% if user.is_authenticated %}
+                        {% if listing.owner_id == user.id %}
+                            <a class="primary-button" href="{% url 'listing-edit' listing.pk %}"><i data-lucide="pencil"></i> Edit listing</a>
+                        {% else %}
+                            <form method="post" action="{% url 'create-request' listing.pk %}">{% csrf_token %}{{ request_form.message }}<button class="primary-button" type="submit"><i data-lucide="send"></i> Send request</button></form>
+                            <form method="post" action="{% url 'toggle-wishlist' listing.pk %}">{% csrf_token %}<button class="secondary-button" type="submit"><i data-lucide="heart"></i> Save listing</button></form>
+                            <a class="secondary-button" href="{% url 'inbox' %}">Message seller</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="primary-button" href="{% url 'auth' %}?screen=login">Sign in to request</a>
+                    {% endif %}
+                </div>
+                {% if user.is_authenticated and listing.owner_id != user.id %}<a class="report-link" href="{% url 'report-listing' listing.pk %}">Report this listing</a>{% endif %}
+            </section>
+        </div>
+    </main>
+{% endblock %}

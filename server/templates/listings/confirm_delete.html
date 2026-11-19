@@ -1,0 +1,2 @@
+{% extends "listings/base.html" %}
+{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Manage listing</p><h1>Delete “{{ listing.title }}”?</h1><p>This action cannot be undone.</p></div><form method="post">{% csrf_token %}<button class="danger-button" type="submit">Delete listing</button> <a class="secondary-button" href="{% url 'listing-detail' listing.pk %}">Cancel</a></form></main>{% endblock %}

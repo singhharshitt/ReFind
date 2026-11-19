@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body class="min-h-screen bg-white text-slate-950">
+    {% if messages %}
+        <div class="toast-stack" aria-live="polite">
+            {% for message in messages %}<div class="toast {{ message.tags }}">{{ message }}</div>{% endfor %}
+        </div>
+    {% endif %}
     {% block content %}{% endblock %}
     <script>
         if (window.lucide) {

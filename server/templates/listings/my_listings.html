@@ -1,0 +1,6 @@
+{% extends "listings/base.html" %}
+{% block content %}
+    {% include "listings/components/header.html" %}
+    <main class="form-shell"><div class="page-heading"><p class="eyebrow">Your activity</p><h1>My listings</h1><p>Manage what you have shared with campus.</p></div>
+    <div class="listing-grid">{% for listing in listings %}<div><a class="manage-link" href="{% url 'listing-edit' listing.pk %}">Edit</a> · <a class="manage-link" href="{% url 'listing-delete' listing.pk %}">Delete</a>{% include "listings/partials/listing_card.html" %}</div>{% empty %}<div class="empty-state">You have not listed anything yet. <a href="{% url 'listing-create' %}">List your first item</a>.</div>{% endfor %}</div></main>
+{% endblock %}

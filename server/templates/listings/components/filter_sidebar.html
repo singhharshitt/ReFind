@@ -3,7 +3,7 @@
         <strong><i data-lucide="list-filter"></i>Filters</strong>
         <a href="{% url 'home' %}" hx-get="{% url 'home' %}" hx-target="#listing-grid">Clear all</a>
     </div>
-    <form id="filters-form">
+    <form id="filters-form" method="get">
         <fieldset>
             <legend>Listing Type</legend>
             <label><input type="checkbox" name="kind" value="sale"
@@ -22,18 +22,18 @@
             <div class="price-range">
                 <div class="range-line"><span></span></div>
                 <div class="price-inputs">
-                    <input type="number" value="0" aria-label="Minimum price">
-                    <input type="number" value="50000" aria-label="Maximum price">
+                    <input name="min_price" type="number" value="{{ request.GET.min_price|default:'0' }}" aria-label="Minimum price">
+                    <input name="max_price" type="number" value="{{ request.GET.max_price|default:'50000' }}" aria-label="Maximum price">
                 </div>
             </div>
         </fieldset>
 
         <fieldset>
             <legend>Condition</legend>
-            <label><input type="checkbox"> Like New (46)</label>
-            <label><input type="checkbox"> Good (78)</label>
-            <label><input type="checkbox"> Fair (36)</label>
-            <label><input type="checkbox"> Used (7)</label>
+            <label><input type="radio" name="condition" value="like-new" {% if request.GET.condition == 'like-new' %}checked{% endif %}> Like New</label>
+            <label><input type="radio" name="condition" value="good" {% if request.GET.condition == 'good' %}checked{% endif %}> Good</label>
+            <label><input type="radio" name="condition" value="fair" {% if request.GET.condition == 'fair' %}checked{% endif %}> Fair</label>
+            <label><input type="radio" name="condition" value="used" {% if request.GET.condition == 'used' %}checked{% endif %}> Used</label>
         </fieldset>
     </form>
 </aside>

@@ -120,9 +120,12 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Production configuration should provide PostgreSQL, media storage, SMTP
-credentials, the allowed campus email domain, and a secret key through
-environment variables. Never commit credentials or `.env` files.
+Copy `server/.env.example` to `server/.env` for local configuration. The
+application accepts `POSTGRES_URI` and the legacy `POSTGRESS_URI` spelling,
+and falls back to SQLite when neither is present. Production configuration
+should provide PostgreSQL, media storage, SMTP credentials, the allowed campus
+email domain, and a secret key through environment variables. Never commit
+credentials or `.env` files.
 
 ## Scope and Limitations
 
