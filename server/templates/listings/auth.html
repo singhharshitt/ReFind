@@ -1,0 +1,135 @@
+{% extends "listings/base.html" %}
+
+{% block title %}ReFind - Join your campus marketplace{% endblock %}
+
+{% block content %}
+<main class="auth-page" data-screen="{{ screen }}">
+    <div class="auth-decoration auth-decoration-top"></div>
+    <div class="auth-decoration auth-decoration-bottom"></div>
+
+    <section class="auth-brand-panel" aria-label="About ReFind">
+        <a class="auth-brand" href="{% url 'home' %}">
+            <span class="auth-brand-mark">
+                <svg viewBox="0 0 34 34" aria-hidden="true">
+                    <path d="M7 27C5 18 9 8 22 5c-1 12-5 19-15 22Z" fill="none" stroke="currentColor" stroke-width="3"/>
+                    <path d="M12 23c5-7 10-11 17-13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <strong>ReFind</strong>
+        </a>
+        <div class="auth-brand-copy">
+            <p class="eyebrow">Campus marketplace</p>
+            <h1>Find it again.<br><em>Give it a new beginning.</em></h1>
+            <p>Buy, sell, exchange, and donate pre-owned items within your trusted campus community.</p>
+        </div>
+        <div class="auth-campus-photo" aria-hidden="true"></div>
+        <div class="auth-trust-list">
+            <span><i data-lucide="shield-check"></i> Campus verified users</span>
+            <span><i data-lucide="users"></i> Safe &amp; trusted community</span>
+            <span><i data-lucide="leaf"></i> Promote reuse &amp; sustainability</span>
+        </div>
+    </section>
+
+    <section class="auth-card" aria-live="polite">
+        <div class="auth-card-header">
+            <span class="auth-step" data-step="register">1</span>
+            <span class="auth-step" data-step="verify">2</span>
+            <span class="auth-step" data-step="success">3</span>
+            <span class="auth-step-line"></span>
+        </div>
+
+        <div class="auth-screen{% if screen == 'register' %} is-active{% endif %}" data-panel="register">
+            <div class="auth-heading">
+                <h2>Create Your Account</h2>
+                <p>Register using your campus email</p>
+            </div>
+            <form class="auth-form" data-form="register">
+                <label><span>Full Name</span><div class="auth-input"><i data-lucide="user-round"></i><input name="name" value="Sagar Sahu" required></div></label>
+                <label><span>Campus Email</span><div class="auth-input valid"><i data-lucide="mail"></i><input name="email" type="email" value="sagar.btechse@ipu.in" required><i data-lucide="circle-check"></i></div></label>
+                <label><span>Password</span><div class="auth-input"><i data-lucide="lock-keyhole"></i><input name="password" type="password" value="password" required><button type="button" class="password-toggle" aria-label="Show password"><i data-lucide="eye"></i></button></div></label>
+                <label><span>Confirm Password</span><div class="auth-input"><i data-lucide="lock-keyhole"></i><input name="confirm_password" type="password" value="password" required><button type="button" class="password-toggle" aria-label="Show password"><i data-lucide="eye"></i></button></div></label>
+                <button class="auth-primary" type="submit">Create Account <i data-lucide="arrow-right"></i></button>
+            </form>
+            <p class="auth-switch">Already have an account? <button type="button" data-go="login">Login</button></p>
+        </div>
+
+        <div class="auth-screen{% if screen == 'login' %} is-active{% endif %}" data-panel="login">
+            <div class="auth-heading">
+                <h2>Welcome Back</h2>
+                <p>Access your ReFind account</p>
+            </div>
+            <form class="auth-form" data-form="login">
+                <label><span>Campus Email</span><div class="auth-input"><i data-lucide="mail"></i><input type="email" value="sagar.btechse@ipu.in" required></div></label>
+                <label><span>Password</span><div class="auth-input"><i data-lucide="lock-keyhole"></i><input type="password" value="password" required><button type="button" class="password-toggle" aria-label="Show password"><i data-lucide="eye"></i></button></div></label>
+                <div class="auth-options"><label class="remember"><input type="checkbox" checked> <span>Remember me</span></label><button type="button" class="auth-link">Forgot password?</button></div>
+                <button class="auth-primary" type="submit">Login <i data-lucide="arrow-right"></i></button>
+            </form>
+            <p class="auth-switch">Don't have an account? <button type="button" data-go="register">Register</button></p>
+        </div>
+
+        <div class="auth-screen{% if screen == 'verify' %} is-active{% endif %}" data-panel="verify">
+            <div class="auth-heading centered">
+                <div class="auth-envelope"><i data-lucide="mail"></i></div>
+                <h2>Verify Your<br><em>Campus Email</em></h2>
+                <p>We've sent a verification link to<br><strong>sagar.btechse@ipu.in</strong></p>
+            </div>
+            <button type="button" class="auth-primary" data-go="inbox">Open Email Inbox <i data-lucide="arrow-right"></i></button>
+            <p class="auth-help">Didn't receive the email? <button type="button" class="auth-link" data-go="inbox">Resend email</button></p>
+        </div>
+
+        <div class="auth-screen{% if screen == 'inbox' %} is-active{% endif %}" data-panel="inbox">
+            <div class="auth-heading centered">
+                <div class="auth-envelope"><i data-lucide="mail-check"></i></div>
+                <h2>Check Your Inbox</h2>
+                <p>A verification link has been sent to</p>
+                <strong class="auth-email-pill">sagar.btechse@ipu.in</strong>
+            </div>
+            <p class="auth-instruction">Click the link in the email to verify your account<br>and start using ReFind.</p>
+            <button type="button" class="auth-outline" data-go="success"><i data-lucide="refresh-cw"></i> Resend Verification Email</button>
+            <p class="auth-help">Didn't receive the email? <button type="button" class="auth-link">Check Spam</button> &nbsp;·&nbsp; <button type="button" class="auth-link">Change Email</button></p>
+        </div>
+
+        <div class="auth-screen{% if screen == 'success' %} is-active{% endif %}">
+            <div class="auth-heading centered success-heading">
+                <div class="auth-success-icon"><i data-lucide="check"></i></div>
+                <h2>Email Verified!</h2>
+                <p>Your campus email has been successfully verified.</p>
+            </div>
+            <button type="button" class="auth-primary" data-go="login">Go to Dashboard <i data-lucide="arrow-right"></i></button>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+    const authPage = document.querySelector('.auth-page');
+    const showPanel = (screen) => {
+        authPage.dataset.screen = screen;
+        document.querySelectorAll('.auth-screen').forEach((panel) => {
+            panel.classList.toggle('is-active', panel.dataset.panel === screen || (!panel.dataset.panel && screen === 'success'));
+        });
+        document.querySelectorAll('.auth-step').forEach((step) => {
+            step.classList.toggle('is-current', step.dataset.step === screen);
+        });
+        window.history.replaceState({}, '', `${window.location.pathname}?screen=${screen}`);
+        if (window.lucide) lucide.createIcons();
+    };
+    document.querySelectorAll('[data-go]').forEach((button) => {
+        button.addEventListener('click', () => showPanel(button.dataset.go));
+    });
+    document.querySelectorAll('.auth-form').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            showPanel(form.dataset.form === 'register' ? 'verify' : 'success');
+        });
+    });
+    document.querySelectorAll('.password-toggle').forEach((button) => {
+        button.addEventListener('click', () => {
+            const input = button.parentElement.querySelector('input');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        });
+    });
+    showPanel(authPage.dataset.screen);
+</script>
+{% endblock %}

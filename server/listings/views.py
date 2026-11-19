@@ -140,3 +140,10 @@ def home(request):
     if request.headers.get('HX-Request'):
         return render(request, 'listings/partials/listing_grid.html', context)
     return render(request, 'listings/home.html', context)
+
+
+def auth(request):
+    screen = request.GET.get('screen', 'register')
+    if screen not in {'register', 'login', 'verify', 'inbox', 'success'}:
+        screen = 'register'
+    return render(request, 'listings/auth.html', {'screen': screen})
