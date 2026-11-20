@@ -1,0 +1,73 @@
+<button class="mobile-nav-toggle" type="button" id="mobile-nav-toggle"
+        aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+    <i data-lucide="menu"></i>
+</button>
+
+<div class="mobile-nav-backdrop" id="mobile-nav-backdrop" hidden aria-hidden="true"></div>
+
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+    <div class="mobile-nav-header">
+        {% include "listings/components/brand.html" with close_nav=True %}
+        <button type="button" class="mobile-nav-close" data-close-mobile-nav aria-label="Close menu">
+            <i data-lucide="x"></i>
+        </button>
+    </div>
+
+    <div class="mobile-nav-links">
+        <a href="{% url 'home' %}" data-close-mobile-nav
+           class="{% if request.resolver_match.url_name == 'home' and not request.GET.kind and not request.GET.category %}active{% endif %}">
+            <i data-lucide="home"></i> Home
+        </a>
+        <a href="{% url 'home' %}" data-close-mobile-nav>
+            <i data-lucide="layout-grid"></i> Listings
+        </a>
+        <a href="{% url 'home' %}?kind=exchange" data-close-mobile-nav
+           class="{% if request.GET.kind == 'exchange' %}active{% endif %}">
+            <i data-lucide="repeat-2"></i> Exchange
+        </a>
+        <a href="{% url 'home' %}?kind=donation" data-close-mobile-nav
+           class="{% if request.GET.kind == 'donation' or request.GET.kind == 'donate' %}active{% endif %}">
+            <i data-lucide="heart"></i> Donate
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'inbox' %}" data-close-mobile-nav
+           class="{% if request.resolver_match.url_name == 'inbox' or request.resolver_match.url_name == 'message-thread' %}active{% endif %}">
+            <i data-lucide="message-square"></i> Messages
+            {% if unread_messages > 0 %}<b class="badge">{{ unread_messages }}</b>{% endif %}
+        </a>
+        <a href="{% url 'requests-dashboard' %}" data-close-mobile-nav
+           class="{% if request.resolver_match.url_name == 'requests-dashboard' %}active{% endif %}">
+            <i data-lucide="bell"></i> Requests
+            {% if pending_received > 0 %}<b class="badge">{{ pending_received }}</b>{% endif %}
+        </a>
+        <a href="{% url 'wishlist' %}" data-close-mobile-nav
+           class="{% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
+            <i data-lucide="heart"></i> Wishlist
+        </a>
+        <a href="{% url 'my-listings' %}" data-close-mobile-nav
+           class="{% if request.resolver_match.url_name == 'my-listings' %}active{% endif %}">
+            <i data-lucide="package"></i> My Listings
+        </a>
+        <a href="{% url 'profile' %}" data-close-mobile-nav
+           class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <i data-lucide="user-round"></i> Profile
+        </a>
+        {% if user.is_staff or user.role == 'admin' %}
+        <a href="{% url 'admin-dashboard' %}" data-close-mobile-nav
+           class="{% if request.resolver_match.url_name == 'admin-dashboard' %}active{% endif %}">
+            <i data-lucide="layout-dashboard"></i> Admin
+        </a>
+        {% endif %}
+        <a href="{% url 'listing-create' %}" data-close-mobile-nav class="mobile-nav-cta">
+            <i data-lucide="plus"></i> List Item
+        </a>
+        <a href="{% url 'logout' %}" data-close-mobile-nav class="logout-link">
+            <i data-lucide="log-out"></i> Log out
+        </a>
+        {% else %}
+        <a href="{% url 'auth' %}?screen=login" data-close-mobile-nav class="mobile-nav-cta">
+            <i data-lucide="log-in"></i> Sign in
+        </a>
+        {% endif %}
+    </div>
+</nav>

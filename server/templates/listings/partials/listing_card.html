@@ -1,26 +1,38 @@
-<article class="listing-card" {% if listing.id %}data-listing-id="{{ listing.id }}"{% endif %}>
+<article class="listing-card" data-listing-id="{{ listing.id }}">
     <div class="listing-image">
-        <img src="{{ listing.image_url|default:listing.image }}" alt="{{ listing.title }}">
-        <span class="listing-kind {{ listing.kind }}">{{ listing.kind_label }}</span>
-        <button class="favorite-button" type="button" aria-label="Add {{ listing.title }} to wishlist"
-                {% if listing.id %}hx-post="{% url 'toggle-wishlist' listing.id %}" hx-swap="outerHTML"{% endif %}>
+        <a href="{% url 'listing-detail' listing.id %}" tabindex="-1" aria-hidden="true">
+            <img src="{{ listing.image_url }}" alt="{{ listing.title }}" loading="lazy">
+        </a>
+        <span class="listing-kind {{ listing.kind }}" aria-label="{{ listing.kind_label }}">{{ listing.kind_label }}</span>
+        {% if user.is_authenticated %}
+            {% if listing.id in saved_ids %}
+                {% include "listings/partials/wishlist_button.html" with listing=listing saved=True %}
+            {% else %}
+                {% include "listings/partials/wishlist_button.html" with listing=listing saved=False %}
+            {% endif %}
+        {% else %}
+        <a class="favorite-button" href="{% url 'auth' %}?screen=login" aria-label="Sign in to save">
             <i data-lucide="heart"></i>
-        </button>
+        </a>
+        {% endif %}
     </div>
     <div class="listing-body">
-        <h3>{% if listing.id %}<a class="listing-title-link" href="{% url 'listing-detail' listing.id %}">{{ listing.title }}</a>{% else %}{{ listing.title }}{% endif %}</h3>
+        <h3>
+            <a class="listing-title-link" href="{% url 'listing-detail' listing.id %}">{{ listing.title }}</a>
+        </h3>
         <div class="listing-price">
-            <strong>{{ listing.price_label|default:listing.price }}</strong>
-            {% if listing.old_price %}<del>{{ listing.old_price }}</del>{% endif %}
-            <span class="condition {{ listing.condition|lower|slugify }}">{{ listing.condition }}</span>
+            <strong>{{ listing.price_label }}</strong>
+            <span class="condition-badge cond-{{ listing.condition }}">{{ listing.get_condition_display }}</span>
         </div>
         <div class="seller-row">
-            <span class="seller-avatar">{{ listing.seller_initial }}</span>
+            <span class="seller-avatar" aria-hidden="true">{{ listing.seller_initial }}</span>
             <div class="seller-info">
                 <strong>{{ listing.seller }}</strong>
-                <span><i data-lucide="star"></i>{{ listing.rating }}</span>
+                <span>
+                    <i data-lucide="star" aria-hidden="true"></i>
+                    {{ listing.rating }}
+                </span>
             </div>
-            <span class="distance"><i data-lucide="map-pin"></i>{{ listing.distance }}</span>
         </div>
     </div>
 </article>

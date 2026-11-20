@@ -1,0 +1,12 @@
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Access denied · ReFind{% endblock %}
+{% block content %}
+<main class="error-shell">
+    <div>
+        <p class="eyebrow">403</p>
+        <h1>Access denied</h1>
+        <p>You don't have permission to view this page.</p>
+        <a class="btn-primary" href="{% url 'home' %}">Back to marketplace</a>
+    </div>
+</main>
+{% endblock %}

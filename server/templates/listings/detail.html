@@ -1,33 +1,252 @@
-{% extends "listings/base.html" %}
+{% extends "listings/layouts/main_layout.html" %}
 {% block title %}{{ listing.title }} · ReFind{% endblock %}
+
 {% block content %}
-    {% include "listings/components/header.html" %}
-    <main class="detail-shell">
-        <a class="back-link" href="{% url 'home' %}"><i data-lucide="arrow-left"></i> Back to listings</a>
-        <div class="detail-grid">
-            <div class="detail-image"><img src="{{ listing.image_url }}" alt="{{ listing.title }}"></div>
-            <section class="detail-copy">
-                <div class="detail-kicker">{{ listing.get_category_display }} · {{ listing.get_condition_display }}</div>
-                <h1>{{ listing.title }}</h1>
-                <div class="detail-price">{{ listing.price_label }}</div>
-                <p class="detail-description">{{ listing.description }}</p>
-                {% if listing.wanted_item_text %}<p class="exchange-note"><i data-lucide="repeat-2"></i> Looking for {{ listing.wanted_item_text }}</p>{% endif %}
-                <div class="detail-seller"><span class="seller-avatar">{{ listing.seller_initial }}</span><div><strong>{{ listing.seller }}</strong><span>Campus member · {{ listing.rating }} rating</span></div></div>
-                <div class="detail-actions">
-                    {% if user.is_authenticated %}
-                        {% if listing.owner_id == user.id %}
-                            <a class="primary-button" href="{% url 'listing-edit' listing.pk %}"><i data-lucide="pencil"></i> Edit listing</a>
-                        {% else %}
-                            <form method="post" action="{% url 'create-request' listing.pk %}">{% csrf_token %}{{ request_form.message }}<button class="primary-button" type="submit"><i data-lucide="send"></i> Send request</button></form>
-                            <form method="post" action="{% url 'toggle-wishlist' listing.pk %}">{% csrf_token %}<button class="secondary-button" type="submit"><i data-lucide="heart"></i> Save listing</button></form>
-                            <a class="secondary-button" href="{% url 'inbox' %}">Message seller</a>
-                        {% endif %}
+
+<main class="detail-shell">
+    <a class="back-link" href="{% url 'home' %}">
+        <i data-lucide="arrow-left"></i> Back to listings
+    </a>
+
+    <div class="detail-grid">
+        <!-- Image gallery -->
+        <div class="detail-gallery">
+            <div class="gallery-main" id="gallery-main">
+                <img id="main-img"
+                     src="{{ listing.image_url }}"
+                     alt="{{ listing.title }}">
+                <span class="detail-kind-badge kind-{{ listing.kind }}">{{ listing.kind_label }}</span>
+                {% if not listing.is_available %}
+                <div class="sold-overlay">
+                    <span>{{ listing.get_status_display }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% if images|length > 1 %}
+            <div class="gallery-thumbs" role="list">
+                {% for img in images %}
+                <button class="thumb-btn {% if forloop.first %}active{% endif %}"
+                        type="button"
+                        role="listitem"
+                        aria-label="Image {{ forloop.counter }}"
+                        onclick="switchImage(this, '{{ img.url }}')">
+                    <img src="{{ img.url }}" alt="Image {{ forloop.counter }}">
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: product info + actions -->
+        <section class="detail-copy">
+            <p class="detail-kicker">
+                <a href="{% url 'home' %}?category={{ listing.category }}">{{ listing.get_category_display }}</a>
+                &nbsp;·&nbsp; {{ listing.get_condition_display }}
+                &nbsp;·&nbsp; <time datetime="{{ listing.created_at|date:'Y-m-d' }}">{{ listing.created_at|date:"M j, Y" }}</time>
+            </p>
+
+            <h1>{{ listing.title }}</h1>
+
+            <div class="detail-price-row">
+                <span class="detail-price">{{ listing.price_label }}</span>
+                {% if listing.listing_type == 'sell' and listing.price %}
+                <span class="condition-badge cond-{{ listing.condition }}">{{ listing.get_condition_display }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Seller card -->
+            <div class="detail-seller">
+                <div class="detail-seller-avatar">
+                    {% if listing.owner.avatar %}
+                    <img src="{{ listing.owner.avatar.url }}" alt="{{ listing.seller }}">
                     {% else %}
-                        <a class="primary-button" href="{% url 'auth' %}?screen=login">Sign in to request</a>
+                    <span>{{ listing.seller_initial }}</span>
                     {% endif %}
                 </div>
-                {% if user.is_authenticated and listing.owner_id != user.id %}<a class="report-link" href="{% url 'report-listing' listing.pk %}">Report this listing</a>{% endif %}
-            </section>
+                <div class="detail-seller-info">
+                    <strong>{{ listing.seller }}</strong>
+                    <span>
+                        {% if seller_avg %}
+                        <i data-lucide="star"></i> {{ seller_avg }} &nbsp;·&nbsp;
+                        {% endif %}
+                        Campus member
+                    </span>
+                </div>
+                {% if seller_avg %}
+                <div class="detail-seller-stars" aria-label="Rating {{ seller_avg }} out of 5">
+                    {% for i in "12345" %}
+                    <i data-lucide="star" class="{% if forloop.counter <= seller_avg|floatformat:'0'|add:'0' %}star-filled{% endif %}"></i>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="detail-desc-block">
+                <p class="detail-description">{{ listing.description|linebreaksbr }}</p>
+                {% if listing.wanted_item_text %}
+                <div class="exchange-note">
+                    <i data-lucide="repeat-2"></i>
+                    <span>Looking for: <strong>{{ listing.wanted_item_text }}</strong></span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="detail-actions">
+                {% if user.is_authenticated %}
+                    {% if is_owner %}
+                    <a class="btn-primary" href="{% url 'listing-edit' listing.pk %}">
+                        <i data-lucide="pencil"></i> Edit Listing
+                    </a>
+                    <a class="btn-secondary" href="{% url 'listing-delete' listing.pk %}">
+                        <i data-lucide="trash-2"></i> Delete
+                    </a>
+                    {% if listing.status == 'available' %}
+                    <form method="post" action="{% url 'listing-unavailable' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-outline" type="submit">
+                            <i data-lucide="eye-off"></i> Mark Unavailable
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    {% elif listing.status == 'available' %}
+                        {% if already_requested %}
+                        <div class="already-requested">
+                            <i data-lucide="clock"></i>
+                            <span>Request sent · <strong>{{ existing_request.get_status_display }}</strong></span>
+                        </div>
+                        {% else %}
+                            {% if listing.listing_type == 'exchange' %}
+                            <!-- Exchange request form -->
+                            <details class="action-details">
+                                <summary class="btn-primary">
+                                    <i data-lucide="repeat-2"></i> Propose Exchange
+                                </summary>
+                                <form class="request-form-panel" method="post" action="{% url 'create-request' listing.pk %}">
+                                    {% csrf_token %}
+                                    <label>
+                                        <span>Your listing to offer (optional)</span>
+                                        {{ exchange_form.offered_listing }}
+                                    </label>
+                                    <label>
+                                        <span>Message to seller</span>
+                                        {{ exchange_form.message }}
+                                    </label>
+                                    <button class="btn-primary" type="submit">
+                                        <i data-lucide="send"></i> Send Proposal
+                                    </button>
+                                </form>
+                            </details>
+                            {% elif listing.listing_type == 'donate' %}
+                            <details class="action-details">
+                                <summary class="btn-primary donate-btn">
+                                    <i data-lucide="gift"></i> Request Donation
+                                </summary>
+                                <form class="request-form-panel" method="post" action="{% url 'create-request' listing.pk %}">
+                                    {% csrf_token %}
+                                    <label>
+                                        <span>Message to donor (optional)</span>
+                                        {{ request_form.message }}
+                                    </label>
+                                    <button class="btn-primary donate-btn" type="submit">
+                                        <i data-lucide="send"></i> Send Request
+                                    </button>
+                                </form>
+                            </details>
+                            {% else %}
+                            <details class="action-details">
+                                <summary class="btn-primary buy-btn">
+                                    <i data-lucide="shopping-bag"></i> Request to Buy
+                                </summary>
+                                <form class="request-form-panel" method="post" action="{% url 'create-request' listing.pk %}">
+                                    {% csrf_token %}
+                                    <label>
+                                        <span>Message to seller (optional)</span>
+                                        {{ request_form.message }}
+                                    </label>
+                                    <button class="btn-primary buy-btn" type="submit">
+                                        <i data-lucide="send"></i> Send Request
+                                    </button>
+                                </form>
+                            </details>
+                            {% endif %}
+                        {% endif %}
+
+                        <!-- Wishlist -->
+                        <form method="post" action="{% url 'toggle-wishlist' listing.pk %}">
+                            {% csrf_token %}
+                            <button class="btn-secondary {% if is_saved %}saved-btn{% endif %}" type="submit">
+                                <i data-lucide="heart"></i>
+                                {% if is_saved %}Saved{% else %}Save to Wishlist{% endif %}
+                            </button>
+                        </form>
+
+                        <!-- Message seller -->
+                        <a class="btn-outline" href="{% url 'start-conversation' listing.pk %}">
+                            <i data-lucide="message-square"></i> Message Seller
+                        </a>
+                    {% else %}
+                    <!-- Listing not available -->
+                    <div class="unavailable-notice">
+                        <i data-lucide="x-circle"></i>
+                        This listing is <strong>{{ listing.get_status_display }}</strong> and no longer accepting requests.
+                    </div>
+                    {% endif %}
+
+                {% else %}
+                <!-- Not authenticated -->
+                <a class="btn-primary" href="{% url 'auth' %}?screen=login&next={% url 'listing-detail' listing.pk %}">
+                    <i data-lucide="log-in"></i> Sign in to request or message
+                </a>
+                {% endif %}
+            </div>
+
+            {% if user.is_authenticated and not is_owner %}
+            <a class="report-link" href="{% url 'report-listing' listing.pk %}">
+                <i data-lucide="flag"></i> Report this listing
+            </a>
+            {% endif %}
+
+            <!-- Buy Safe notice -->
+            <div class="safe-notice">
+                <strong><i data-lucide="shield-check"></i> Buy Safe on ReFind</strong>
+                <ul>
+                    <li>Campus community members only</li>
+                    <li>Meet in a safe, public location on campus</li>
+                    <li>Check the product before payment</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- Seller reviews -->
+    {% if seller_reviews %}
+    <section class="reviews-section" aria-label="Seller reviews">
+        <h2>Reviews for {{ listing.seller }}</h2>
+        <div class="reviews-grid">
+            {% for review in seller_reviews %}
+            <article class="review-card">
+                <div class="review-header">
+                    <span class="review-avatar">{{ review.requester.avatar_initials|default:"U" }}</span>
+                    <div>
+                        <strong>{{ review.requester.get_display_name }}</strong>
+                        <div class="review-stars" aria-label="Rating {{ review.rating }} out of 5">
+                            {% for i in "12345" %}
+                            <i data-lucide="star" class="{% if forloop.counter <= review.rating %}star-filled{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <time class="review-date">{{ review.updated_at|date:"M Y" }}</time>
+                </div>
+                {% if review.review_text %}
+                <p class="review-text">{{ review.review_text }}</p>
+                {% endif %}
+            </article>
+            {% endfor %}
         </div>
-    </main>
+    </section>
+    {% endif %}
+</main>
 {% endblock %}

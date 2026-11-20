@@ -1,13 +1,157 @@
-{% extends "listings/base.html" %}
-{% block title %}List an item · ReFind{% endblock %}
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}{% if editing %}Edit listing{% else %}List an item{% endif %} · ReFind{% endblock %}
+
 {% block content %}
-    {% include "listings/components/header.html" %}
-    <main class="form-shell">
-        <div class="page-heading"><p class="eyebrow">Share with your campus</p><h1>List an item</h1><p>Give something useful a second life.</p></div>
-        <form class="listing-form" method="post">{% csrf_token %}
-            {{ form.non_field_errors }}
-            {% for field in form %}<label><span>{{ field.label }}</span>{{ field }}{% for error in field.errors %}<small class="form-error">{{ error }}</small>{% endfor %}</label>{% endfor %}
-            <button class="primary-button" type="submit"><i data-lucide="plus"></i> Publish listing</button>
-        </form>
-    </main>
+
+<main class="form-shell">
+    <div class="form-layout">
+        <!-- Left: tips panel -->
+        <aside class="form-tips" aria-label="Listing tips">
+            <h2>{% if editing %}Update Your Listing{% else %}Create a New Listing{% endif %}</h2>
+            <p>{% if editing %}Make your changes below and save.{% else %}Sell, exchange, or donate items with your campus community.{% endif %}</p>
+            <ul class="tips-list">
+                <li><i data-lucide="camera"></i> <span>Add clear, well-lit photos of your item</span></li>
+                <li><i data-lucide="file-text"></i> <span>Provide accurate title, category and description</span></li>
+                <li><i data-lucide="repeat-2"></i> <span>Choose the right listing type: Sell, Exchange or Donate</span></li>
+                <li><i data-lucide="shield-check"></i> <span>Be honest and transparent about condition and price</span></li>
+            </ul>
+        </aside>
+
+        <!-- Right: form -->
+        <div class="form-card">
+            {% if editing %}
+            <div class="form-tabs">
+                <span class="form-tab active">Edit Listing</span>
+            </div>
+            {% else %}
+            <div class="form-tabs">
+                <span class="form-tab active">Create Listing</span>
+            </div>
+            {% endif %}
+
+            <form class="listing-form" method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                <div class="form-two-col">
+                    <div class="form-field">
+                        <label for="{{ form.title.id_for_label }}">Title <span class="required">*</span></label>
+                        {{ form.title }}
+                        {% for e in form.title.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ form.category.id_for_label }}">Category <span class="required">*</span></label>
+                        {{ form.category }}
+                        {% for e in form.category.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-two-col">
+                    <div class="form-field">
+                        <label for="{{ form.listing_type.id_for_label }}">Listing Type <span class="required">*</span></label>
+                        <div class="type-toggle" role="radiogroup" aria-label="Listing type">
+                            <label class="type-option sell-opt">
+                                <input type="radio" name="listing_type" value="sell"
+                                       {% if form.listing_type.value == 'sell' or not form.listing_type.value %}checked{% endif %}>
+                                <i data-lucide="shopping-bag"></i> For Sale
+                            </label>
+                            <label class="type-option exchange-opt">
+                                <input type="radio" name="listing_type" value="exchange"
+                                       {% if form.listing_type.value == 'exchange' %}checked{% endif %}>
+                                <i data-lucide="repeat-2"></i> For Exchange
+                            </label>
+                            <label class="type-option donate-opt">
+                                <input type="radio" name="listing_type" value="donate"
+                                       {% if form.listing_type.value == 'donate' %}checked{% endif %}>
+                                <i data-lucide="gift"></i> For Donation
+                            </label>
+                        </div>
+                        {% for e in form.listing_type.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ form.condition.id_for_label }}">Condition <span class="required">*</span></label>
+                        <div class="condition-toggle" role="radiogroup" aria-label="Condition">
+                            {% for val, label in form.condition.field.choices %}
+                            <label class="cond-option">
+                                <input type="radio" name="condition" value="{{ val }}"
+                                       {% if form.condition.value == val %}checked{% endif %}>
+                                {{ label }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% for e in form.condition.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                    </div>
+                </div>
+
+                <!-- Price (shown for Sell) / Wanted item (shown for Exchange) -->
+                <div class="form-field price-field" id="price-field">
+                    <label for="{{ form.price.id_for_label }}">Price <span class="required">*</span></label>
+                    {{ form.price }}
+                    {% for e in form.price.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                </div>
+
+                <div class="form-field wanted-field" id="wanted-field" style="display:none">
+                    <label for="{{ form.wanted_item_text.id_for_label }}">What do you want in return? <span class="required">*</span></label>
+                    {{ form.wanted_item_text }}
+                    {% for e in form.wanted_item_text.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.description.id_for_label }}">Description <span class="required">*</span></label>
+                    {{ form.description }}
+                    {% for e in form.description.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                </div>
+
+                <!-- Images -->
+                <div class="form-field">
+                    <label>Images (Up to 3)</label>
+                    <div class="image-upload-grid">
+                        <div class="image-upload-slot">
+                            <label class="image-upload-label" for="{{ form.image.id_for_label }}">
+                                {% if editing and listing.image %}
+                                <img class="img-preview" src="{{ listing.image.url }}" alt="Current image">
+                                {% else %}
+                                <i data-lucide="image-plus"></i>
+                                <span>Main photo<br><small>Required · JPG, PNG up to 5 MB</small></span>
+                                {% endif %}
+                            </label>
+                            {{ form.image }}
+                            {% for e in form.image.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                        </div>
+                        <div class="image-upload-slot">
+                            <label class="image-upload-label" for="{{ form.image2.id_for_label }}">
+                                {% if editing and listing.image2 %}
+                                <img class="img-preview" src="{{ listing.image2.url }}" alt="Image 2">
+                                {% else %}
+                                <i data-lucide="image-plus"></i>
+                                <span>Second photo<br><small>Optional</small></span>
+                                {% endif %}
+                            </label>
+                            {{ form.image2 }}
+                        </div>
+                        <div class="image-upload-slot">
+                            <label class="image-upload-label" for="{{ form.image3.id_for_label }}">
+                                {% if editing and listing.image3 %}
+                                <img class="img-preview" src="{{ listing.image3.url }}" alt="Image 3">
+                                {% else %}
+                                <i data-lucide="image-plus"></i>
+                                <span>Third photo<br><small>Optional</small></span>
+                                {% endif %}
+                            </label>
+                            {{ form.image3 }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-submit-row">
+                    <a class="btn-outline" href="{% if editing %}{% url 'listing-detail' listing.pk %}{% else %}{% url 'home' %}{% endif %}">Cancel</a>
+                    <button class="btn-primary" type="submit">
+                        <i data-lucide="{% if editing %}save{% else %}plus{% endif %}"></i>
+                        {% if editing %}Save Changes{% else %}Publish Listing{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
 {% endblock %}

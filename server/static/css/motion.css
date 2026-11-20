@@ -1,0 +1,256 @@
+/**
+ * ReFind motion system — polished micro-interactions without distraction
+ */
+
+/* Scroll / intersection reveals */
+.rf-animate {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--motion-emphasis) var(--ease-enter),
+    transform var(--motion-emphasis) var(--ease-enter);
+  will-change: opacity, transform;
+}
+.rf-animate.is-visible {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+.rf-animate-scale {
+  opacity: 0;
+  transform: scale(0.96) translateY(12px);
+  transition:
+    opacity var(--motion-slow) var(--ease-enter),
+    transform var(--motion-slow) var(--ease-enter);
+}
+.rf-animate-scale.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stagger helpers for grids (applied via JS delay) */
+.rf-stagger > .rf-animate {
+  transition-delay: calc(var(--stagger-index, 0) * 40ms);
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.btn-danger,
+.primary-button,
+.auth-primary,
+.auth-outline {
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+.btn-primary:hover,
+.primary-button:hover,
+.auth-primary:hover {
+  transform: translateY(-1px);
+}
+.btn-primary:active,
+.btn-secondary:active,
+.btn-outline:active,
+.primary-button:active,
+.auth-primary:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: var(--motion-instant);
+}
+.btn-primary.is-loading,
+.auth-primary.is-loading,
+button[disabled],
+.btn-primary:disabled {
+  opacity: 0.7;
+  pointer-events: none;
+  transform: none;
+}
+
+/* Listing cards */
+.listing-card,
+.my-listing-card,
+.request-card,
+.admin-stat-card,
+.review-card {
+  transition:
+    transform var(--transition-emphasis),
+    box-shadow var(--transition-emphasis),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+.listing-card:hover,
+.my-listing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+.listing-card .listing-image img {
+  transition: transform var(--motion-slow) var(--ease-emphasized);
+}
+.listing-card:hover .listing-image img {
+  transform: scale(1.04);
+}
+
+/* Wishlist heart */
+.favorite-button {
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+.favorite-button:hover {
+  transform: scale(1.08);
+}
+.favorite-button.saved {
+  animation: rf-heart-pop var(--motion-emphasis) var(--ease-emphasized);
+}
+@keyframes rf-heart-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Nav / dropdown */
+.nav-link {
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+.profile-dropdown {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top right;
+  pointer-events: none;
+  transition:
+    opacity var(--motion-fast) var(--ease-exit),
+    transform var(--motion-fast) var(--ease-exit),
+    visibility 0s linear var(--motion-fast);
+  visibility: hidden;
+  display: block !important;
+}
+.profile-dropdown.is-open {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  visibility: visible;
+  transition:
+    opacity var(--motion-emphasis) var(--ease-enter),
+    transform var(--motion-emphasis) var(--ease-enter),
+    visibility 0s;
+}
+
+/* Toasts */
+.toast {
+  animation: rf-toast-in var(--motion-emphasis) var(--ease-enter);
+}
+.toast.is-leaving {
+  animation: rf-toast-out var(--motion-fast) var(--ease-exit) forwards;
+}
+@keyframes rf-toast-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rf-toast-out {
+  to { opacity: 0; transform: translateX(24px); }
+}
+
+/* Forms */
+.auth-input,
+.rf-input,
+.listing-form input,
+.listing-form select,
+.listing-form textarea,
+.search-box {
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+/* Mobile drawers */
+.mobile-nav,
+.filters-drawer-host {
+  transition: transform var(--motion-emphasis) var(--ease-emphasized);
+}
+.mobile-nav-backdrop,
+.mobile-filters-backdrop {
+  transition: opacity var(--motion-base) var(--ease-standard);
+}
+
+/* Theme toggle */
+.theme-toggle {
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+.theme-toggle:active {
+  transform: scale(0.92);
+}
+
+/* Hero ambient canvas */
+.hero {
+  isolation: isolate;
+}
+.hero-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.55;
+}
+[data-theme='dark'] .hero-ambient {
+  opacity: 0.4;
+}
+
+/* How-it-works icons */
+.how-icon {
+  transition: transform var(--transition-emphasis), background var(--transition-fast);
+}
+.how-step:hover .how-icon {
+  transform: translateY(-2px) scale(1.06);
+}
+
+/* Smooth anchors */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduced motion — accessibility first */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .rf-animate,
+  .rf-animate-scale {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .rf-reveal-char {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .rf-reveal-cursor,
+  .hero-ambient {
+    display: none !important;
+  }
+
+  .listing-card:hover,
+  .my-listing-card:hover {
+    transform: none;
+  }
+}

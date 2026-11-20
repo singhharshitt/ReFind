@@ -1,39 +1,81 @@
 <header class="site-header">
-    <a class="brand" href="{% url 'home' %}" aria-label="ReFind home">
-        <span class="brand-mark">
-            <svg viewBox="0 0 34 34" aria-hidden="true">
-                <path d="M7 27C5 18 9 8 22 5c-1 12-5 19-15 22Z" fill="none" stroke="currentColor" stroke-width="3"/>
-                <path d="M12 23c5-7 10-11 17-13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-        </span>
-        <span>ReFind</span>
-    </a>
-    <span class="marketplace-label">Campus Marketplace</span>
+    {% include "listings/components/brand.html" %}
+    <span class="marketplace-label" aria-hidden="true">Campus Marketplace</span>
+
     <nav class="main-nav" aria-label="Main navigation">
-        <a class="nav-link active" href="{% url 'home' %}">
+        <a class="nav-link{% if request.resolver_match.url_name == 'home' and not request.GET.kind and not request.GET.category %} active{% endif %}"
+           href="{% url 'home' %}">
             <i data-lucide="home"></i><span>Home</span>
         </a>
-        <a class="nav-link" href="{% url 'home' %}">
+        <a class="nav-link{% if request.resolver_match.url_name == 'home' and request.GET.kind != 'exchange' and request.GET.kind != 'donation' and request.GET.kind != 'donate' and request.GET.category %} active{% endif %}"
+           href="{% url 'home' %}">
             <i data-lucide="layout-grid"></i><span>Listings</span>
         </a>
-        <a class="nav-link" href="{% url 'home' %}?kind=exchange">
+        <a class="nav-link{% if request.GET.kind == 'exchange' %} active{% endif %}"
+           href="{% url 'home' %}?kind=exchange">
             <i data-lucide="repeat-2"></i><span>Exchange</span>
         </a>
-        <a class="nav-link" href="{% url 'home' %}?kind=donation">
+        <a class="nav-link{% if request.GET.kind == 'donation' or request.GET.kind == 'donate' %} active{% endif %}"
+           href="{% url 'home' %}?kind=donation">
             <i data-lucide="heart"></i><span>Donate</span>
         </a>
-        <a class="nav-link" href="{% url 'inbox' %}">
-            <i data-lucide="message-square"></i><span>Messages</span><b>3</b>
+        {% if user.is_authenticated %}
+        <a class="nav-link{% if request.resolver_match.url_name == 'inbox' or request.resolver_match.url_name == 'message-thread' %} active{% endif %}"
+           href="{% url 'inbox' %}">
+            <i data-lucide="message-square"></i><span>Messages</span>
+            {% if unread_messages > 0 %}<b class="badge">{{ unread_messages }}</b>{% endif %}
         </a>
+        {% endif %}
     </nav>
+
     <div class="header-actions">
-        <button class="icon-button" type="button" aria-label="Notifications">
-            <i data-lucide="bell"></i><span class="notification-dot"></span>
+        <button type="button" class="icon-button theme-toggle" id="theme-toggle"
+                aria-label="Toggle dark mode" title="Toggle theme">
+            <i data-lucide="moon" class="theme-icon-moon"></i>
+            <i data-lucide="sun" class="theme-icon-sun"></i>
         </button>
-        <a class="profile-button" href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'auth' %}{% endif %}">
-            <span class="profile-avatar">{% if user.is_authenticated %}{{ user.avatar_initials|default:"S" }}{% else %}S{% endif %}</span>
-            <span>{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Sign in{% endif %}</span>
-            <i data-lucide="chevron-down"></i>
+        {% if user.is_authenticated %}
+        <a class="icon-button{% if request.resolver_match.url_name == 'requests-dashboard' %} active-icon{% endif %}"
+           href="{% url 'requests-dashboard' %}" aria-label="Requests">
+            <i data-lucide="bell"></i>
+            {% if pending_received > 0 %}<span class="notification-dot" aria-label="{{ pending_received }} pending requests"></span>{% endif %}
         </a>
+        <div class="profile-dropdown-wrapper">
+            <button class="profile-button" type="button" aria-expanded="false" aria-haspopup="true" id="profile-btn">
+                {% if user.avatar %}
+                <img class="profile-avatar" src="{{ user.avatar.url }}" alt="{{ user.get_display_name }}">
+                {% else %}
+                <span class="profile-avatar">{{ user.avatar_initials|default:"U" }}</span>
+                {% endif %}
+                <span class="profile-name">{{ user.get_display_name }}</span>
+                <i data-lucide="chevron-down"></i>
+            </button>
+            <div class="profile-dropdown" id="profile-dropdown" aria-labelledby="profile-btn">
+                <div class="dropdown-header">
+                    <strong>{{ user.get_display_name }}</strong>
+                    <small>{{ user.email }}</small>
+                </div>
+                <div class="dropdown-links">
+                    <a href="{% url 'profile' %}"><i data-lucide="user-round"></i> My Profile</a>
+                    <a href="{% url 'my-listings' %}"><i data-lucide="package"></i> My Listings</a>
+                    <a href="{% url 'wishlist' %}"><i data-lucide="heart"></i> Wishlist</a>
+                    <a href="{% url 'requests-dashboard' %}"><i data-lucide="repeat-2"></i> Requests</a>
+                    {% if user.is_staff or user.role == 'admin' %}
+                    <a href="{% url 'admin-dashboard' %}"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+                    {% endif %}
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'logout' %}" class="logout-link"><i data-lucide="log-out"></i> Log out</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <a class="primary-button header-signin" href="{% url 'auth' %}?screen=login">
+            <i data-lucide="log-in"></i> <span>Sign in</span>
+        </a>
+        {% endif %}
+        <a class="primary-button header-list-btn" href="{% url 'listing-create' %}">
+            <i data-lucide="plus"></i> <span>List Item</span>
+        </a>
+        {% include "listings/components/mobile_nav.html" %}
     </div>
 </header>

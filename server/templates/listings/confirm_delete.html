@@ -1,2 +1,33 @@
-{% extends "listings/base.html" %}
-{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Manage listing</p><h1>Delete “{{ listing.title }}”?</h1><p>This action cannot be undone.</p></div><form method="post">{% csrf_token %}<button class="danger-button" type="submit">Delete listing</button> <a class="secondary-button" href="{% url 'listing-detail' listing.pk %}">Cancel</a></form></main>{% endblock %}
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Delete Listing · ReFind{% endblock %}
+
+{% block content %}
+<main class="form-shell">
+    <div class="page-heading">
+        <p class="eyebrow">Manage listing</p>
+        <h1>Delete Listing</h1>
+    </div>
+    <div class="confirm-delete-card">
+        <div class="confirm-listing-preview">
+            <img src="{{ listing.image_url }}" alt="{{ listing.title }}">
+            <div>
+                <strong>{{ listing.title }}</strong>
+                <span>{{ listing.get_category_display }} · {{ listing.price_label }}</span>
+            </div>
+        </div>
+        <p class="confirm-warning">
+            <i data-lucide="alert-triangle"></i>
+            This action cannot be undone. The listing and all associated messages and requests will be permanently deleted.
+        </p>
+        <div class="confirm-actions">
+            <a class="btn-outline" href="{% url 'listing-detail' listing.pk %}">Keep Listing</a>
+            <form method="post">
+                {% csrf_token %}
+                <button class="btn-danger" type="submit">
+                    <i data-lucide="trash-2"></i> Yes, Delete Listing
+                </button>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

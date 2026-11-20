@@ -1,0 +1,12 @@
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Something went wrong · ReFind{% endblock %}
+{% block content %}
+<main class="error-shell">
+    <div>
+        <p class="eyebrow">500</p>
+        <h1>Something went wrong</h1>
+        <p>We're fixing it. Please try again in a moment.</p>
+        <a class="btn-primary" href="{% url 'home' %}">Back to marketplace</a>
+    </div>
+</main>
+{% endblock %}

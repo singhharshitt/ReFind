@@ -1,0 +1,12 @@
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Page not found · ReFind{% endblock %}
+{% block content %}
+<main class="error-shell">
+    <div>
+        <p class="eyebrow">404</p>
+        <h1>Lost on campus?</h1>
+        <p>That page doesn't exist or may have been moved.</p>
+        <a class="btn-primary" href="{% url 'home' %}">Back to marketplace</a>
+    </div>
+</main>
+{% endblock %}

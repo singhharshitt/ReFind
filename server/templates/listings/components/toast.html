@@ -1,0 +1,12 @@
+{% if messages %}
+<div class="toast-stack" aria-live="polite" role="status">
+    {% for message in messages %}
+    <div class="toast {{ message.tags }}" role="alert">
+        {% if message.tags == 'error' %}<i data-lucide="x-circle"></i>
+        {% elif message.tags == 'warning' %}<i data-lucide="alert-triangle"></i>
+        {% else %}<i data-lucide="check-circle-2"></i>{% endif %}
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

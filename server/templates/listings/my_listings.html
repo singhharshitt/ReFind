@@ -1,6 +1,76 @@
-{% extends "listings/base.html" %}
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}My Listings · ReFind{% endblock %}
+
 {% block content %}
-    {% include "listings/components/header.html" %}
-    <main class="form-shell"><div class="page-heading"><p class="eyebrow">Your activity</p><h1>My listings</h1><p>Manage what you have shared with campus.</p></div>
-    <div class="listing-grid">{% for listing in listings %}<div><a class="manage-link" href="{% url 'listing-edit' listing.pk %}">Edit</a> · <a class="manage-link" href="{% url 'listing-delete' listing.pk %}">Delete</a>{% include "listings/partials/listing_card.html" %}</div>{% empty %}<div class="empty-state">You have not listed anything yet. <a href="{% url 'listing-create' %}">List your first item</a>.</div>{% endfor %}</div></main>
+
+<main class="form-shell">
+    <div class="page-heading-row">
+        <div>
+            <p class="eyebrow">Your activity</p>
+            <h1>My Listings</h1>
+            <p>Manage what you've shared with campus.</p>
+        </div>
+        <a class="btn-primary" href="{% url 'listing-create' %}">
+            <i data-lucide="plus"></i> New Listing
+        </a>
+    </div>
+
+    <!-- Status filter -->
+    <div class="status-filter-tabs">
+        <a href="{% url 'my-listings' %}" class="status-tab {% if not status_filter %}active{% endif %}">All</a>
+        {% for val, label in statuses %}
+        <a href="{% url 'my-listings' %}?status={{ val }}"
+           class="status-tab {% if status_filter == val %}active{% endif %}">
+            {{ label }}
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if listings %}
+    <div class="my-listings-grid">
+        {% for listing in listings %}
+        <article class="my-listing-card">
+            <div class="my-listing-img">
+                <a href="{% url 'listing-detail' listing.pk %}">
+                    <img src="{{ listing.image_url }}" alt="{{ listing.title }}">
+                </a>
+                <span class="listing-kind {{ listing.kind }}">{{ listing.kind_label }}</span>
+                <span class="my-listing-status status-{{ listing.status }}">{{ listing.get_status_display }}</span>
+            </div>
+            <div class="my-listing-body">
+                <h3><a href="{% url 'listing-detail' listing.pk %}">{{ listing.title }}</a></h3>
+                <p class="my-listing-price">{{ listing.price_label }}</p>
+                <p class="my-listing-date">Listed {{ listing.created_at|date:"M j, Y" }}</p>
+                <div class="my-listing-actions">
+                    <a class="btn-small-outline" href="{% url 'listing-edit' listing.pk %}">
+                        <i data-lucide="pencil"></i> Edit
+                    </a>
+                    <a class="btn-small-outline" href="{% url 'listing-detail' listing.pk %}">
+                        <i data-lucide="eye"></i> View
+                    </a>
+                    {% if listing.status == 'available' %}
+                    <form method="post" action="{% url 'listing-unavailable' listing.pk %}">
+                        {% csrf_token %}
+                        <button class="btn-small-outline" type="submit">
+                            <i data-lucide="eye-off"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                    <a class="btn-small-danger" href="{% url 'listing-delete' listing.pk %}">
+                        <i data-lucide="trash-2"></i>
+                    </a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state large">
+        <i data-lucide="package"></i>
+        <h3>No listings yet</h3>
+        <p>Share something you no longer need with your campus community.</p>
+        <a class="btn-primary" href="{% url 'listing-create' %}">List your first item</a>
+    </div>
+    {% endif %}
+</main>
 {% endblock %}

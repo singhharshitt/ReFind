@@ -1,2 +1,124 @@
-{% extends "listings/base.html" %}
-{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Stay connected</p><h1>Inbox</h1><p>Listing-based conversations with your campus community.</p></div><div class="inbox-layout"><aside class="conversation-list">{% for item in conversations %}<div class="conversation-item">Listing #{{ item.listing }}</div>{% empty %}<div class="empty-state">No conversations yet.</div>{% endfor %}</aside><section class="thread-panel">{% if listing and partner %}<h2>{{ listing.title }}</h2>{% for message in thread %}<div class="message-bubble {% if message.sender_id == user.id %}mine{% endif %}"><strong>{{ message.sender.get_full_name|default:message.sender.username }}</strong><p>{{ message.body }}</p><small>{{ message.sent_at }}</small></div>{% endfor %}<form method="post" action="{% url 'send-message' listing.pk partner.pk %}">{% csrf_token %}{{ message_form.body }}<button class="primary-button" type="submit">Send message</button></form>{% else %}<div class="empty-state">Select a conversation to view messages.</div>{% endif %}</section></div></main>{% endblock %}
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Messages · ReFind{% endblock %}
+
+{% block content %}
+
+<main class="inbox-shell">
+    <div class="inbox-layout">
+
+        <!-- Conversation list -->
+        <aside class="conversation-list" aria-label="Conversations">
+            <div class="inbox-header">
+                <h1>Messages</h1>
+                <p class="inbox-sub">Your conversations on ReFind.</p>
+            </div>
+
+            {% if conversations %}
+            <ul class="conv-list" role="list">
+                {% for conv in conversations %}
+                <li class="conv-item {% if listing and listing.id == conv.listing.id and partner and partner.id == conv.partner.id %}active{% endif %}"
+                    role="listitem">
+                    <a href="{% url 'message-thread' conv.listing.id conv.partner.id %}" class="conv-link">
+                        <div class="conv-avatar">
+                            {% if conv.partner.avatar %}
+                            <img src="{{ conv.partner.avatar.url }}" alt="{{ conv.partner.get_display_name }}">
+                            {% else %}
+                            <span>{{ conv.partner.avatar_initials|default:"U" }}</span>
+                            {% endif %}
+                            {% if conv.unread > 0 %}
+                            <span class="conv-unread-dot" aria-label="{{ conv.unread }} unread"></span>
+                            {% endif %}
+                        </div>
+                        <div class="conv-info">
+                            <div class="conv-name-row">
+                                <strong>{{ conv.partner.get_display_name }}</strong>
+                                <time class="conv-time">{{ conv.last_message.sent_at|timesince }} ago</time>
+                            </div>
+                            <span class="conv-listing">{{ conv.listing.title|truncatechars:30 }}</span>
+                            <p class="conv-preview">{{ conv.last_message.body|truncatechars:50 }}</p>
+                        </div>
+                        {% if conv.unread > 0 %}
+                        <span class="conv-badge" aria-label="{{ conv.unread }} unread messages">{{ conv.unread }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="empty-state-inbox">
+                <i data-lucide="message-square-off"></i>
+                <p>No conversations yet.</p>
+                <a class="btn-primary" href="{% url 'home' %}">Browse listings</a>
+            </div>
+            {% endif %}
+        </aside>
+
+        <!-- Thread panel -->
+        <section class="thread-panel" aria-label="Message thread">
+            {% if listing and partner %}
+            <div class="thread-header">
+                <div class="thread-partner">
+                    <div class="conv-avatar">
+                        {% if partner.avatar %}
+                        <img src="{{ partner.avatar.url }}" alt="{{ partner.get_display_name }}">
+                        {% else %}
+                        <span>{{ partner.avatar_initials|default:"U" }}</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <strong>{{ partner.get_display_name }}</strong>
+                        <span class="partner-role">Campus member</span>
+                    </div>
+                </div>
+                <div class="thread-listing-ref">
+                    <a href="{% url 'listing-detail' listing.id %}" class="thread-listing-link">
+                        <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="thread-listing-img">
+                        <div>
+                            <span class="thread-listing-title">{{ listing.title }}</span>
+                            <span class="thread-listing-price">{{ listing.price_label }}</span>
+                        </div>
+                        <i data-lucide="external-link"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="thread-messages" id="thread-messages" aria-live="polite">
+                {% if thread %}
+                {% for msg in thread %}
+                <div class="message-bubble {% if msg.sender_id == user.id %}mine{% endif %}">
+                    <p>{{ msg.body|linebreaksbr }}</p>
+                    <time class="msg-time" datetime="{{ msg.sent_at|date:'c' }}">{{ msg.sent_at|date:"g:i A" }}</time>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="thread-empty">
+                    <i data-lucide="message-square"></i>
+                    <p>Start the conversation</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <form class="message-compose"
+                  method="post"
+                  action="{% url 'send-message' listing.id partner.id %}"
+                  id="message-form">
+                {% csrf_token %}
+                <div class="compose-input-row">
+                    {{ message_form.body }}
+                    <button class="btn-send" type="submit" aria-label="Send message">
+                        <i data-lucide="send"></i>
+                    </button>
+                </div>
+            </form>
+
+            {% else %}
+            <div class="thread-placeholder">
+                <i data-lucide="message-square"></i>
+                <h2>Your Messages</h2>
+                <p>Select a conversation from the left to read and reply to messages.</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</main>
+{% endblock %}

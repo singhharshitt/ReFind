@@ -1,2 +1,250 @@
-{% extends "listings/base.html" %}
-{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Administration</p><h1>Platform dashboard</h1><p>Live marketplace activity and moderation.</p></div><div class="stats-grid"><div class="stat-card"><strong>{{ users_count }}</strong><span>Users</span></div><div class="stat-card"><strong>{{ listings_count }}</strong><span>Listings</span></div><div class="stat-card"><strong>{{ requests_count }}</strong><span>Requests</span></div><div class="stat-card"><strong>{{ reports_count }}</strong><span>Open reports</span></div></div><section class="admin-section"><h2>Recent reports</h2>{% for report in recent_reports %}<div class="request-card"><strong>{{ report.listing.title }}</strong><span>{{ report.status }} · {{ report.created_at|date:"M j, Y" }}</span><p>{{ report.reason }}</p></div>{% empty %}<div class="empty-state">No reports to review.</div>{% endfor %}</section></main>{% endblock %}
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Admin Dashboard · ReFind{% endblock %}
+
+{% block content %}
+
+<main class="admin-shell">
+    <div class="admin-layout">
+
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-brand">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Admin Panel</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="{% url 'admin-dashboard' %}" class="admin-nav-link active">
+                    <i data-lucide="bar-chart-2"></i> Dashboard
+                </a>
+                <a href="/admin/listings/user/" class="admin-nav-link">
+                    <i data-lucide="users"></i> Users
+                </a>
+                <a href="/admin/listings/listing/" class="admin-nav-link">
+                    <i data-lucide="package"></i> Listings
+                </a>
+                <a href="/admin/listings/report/" class="admin-nav-link">
+                    <i data-lucide="flag"></i> Reports
+                </a>
+                <a href="/admin/listings/request/" class="admin-nav-link">
+                    <i data-lucide="repeat-2"></i> Transactions
+                </a>
+                <a href="/admin/listings/message/" class="admin-nav-link">
+                    <i data-lucide="message-square"></i> Messages
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <div class="admin-content">
+            <div class="admin-topbar">
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p>Monitor, moderate and manage the ReFind platform.</p>
+                </div>
+            </div>
+
+            <!-- Stats row -->
+            <div class="admin-stats-grid">
+                <div class="admin-stat-card">
+                    <div class="stat-icon users-icon"><i data-lucide="users"></i></div>
+                    <div class="stat-body">
+                        <strong>{{ users_count }}</strong>
+                        <span>Total Users</span>
+                        <small>{{ active_users_count }} active</small>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="stat-icon listings-icon"><i data-lucide="package"></i></div>
+                    <div class="stat-body">
+                        <strong>{{ listings_count }}</strong>
+                        <span>Total Listings</span>
+                        <small>{{ available_count }} available</small>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="stat-icon requests-icon"><i data-lucide="repeat-2"></i></div>
+                    <div class="stat-body">
+                        <strong>{{ requests_count }}</strong>
+                        <span>Total Requests</span>
+                        <small>{{ completed_count }} completed</small>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="stat-icon reports-icon"><i data-lucide="flag"></i></div>
+                    <div class="stat-body">
+                        <strong>{{ reports_count }}</strong>
+                        <span>Open Reports</span>
+                        <small>Needs review</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-two-col">
+                <!-- Open reports -->
+                <section class="admin-section">
+                    <div class="admin-section-header">
+                        <h2><i data-lucide="flag"></i> Recent Reports</h2>
+                        <a href="/admin/listings/report/" class="admin-view-all">View all →</a>
+                    </div>
+                    {% if recent_reports %}
+                    <div class="admin-report-list">
+                        {% for report in recent_reports %}
+                        <div class="admin-report-card">
+                            <div class="report-info">
+                                <strong>{{ report.listing.title|truncatechars:40 }}</strong>
+                                <span>Reported by {{ report.reporter.get_display_name }} · {{ report.created_at|timesince }} ago</span>
+                                <p>{{ report.reason|truncatechars:80 }}</p>
+                            </div>
+                            <div class="report-actions">
+                                <span class="req-status status-{{ report.status }}">{{ report.get_status_display }}</span>
+                                {% if report.status == 'open' %}
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="resolve_report">
+                                    <input type="hidden" name="target_id" value="{{ report.pk }}">
+                                    <button class="btn-small-primary" type="submit">Resolve</button>
+                                </form>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="dismiss_report">
+                                    <input type="hidden" name="target_id" value="{{ report.pk }}">
+                                    <button class="btn-small-outline" type="submit">Dismiss</button>
+                                </form>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="remove_listing">
+                                    <input type="hidden" name="target_id" value="{{ report.listing.pk }}">
+                                    <button class="btn-small-danger" type="submit"
+                                            onclick="return confirm('Remove this listing?')">Remove Listing</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i data-lucide="shield-check"></i>
+                        <p>No open reports.</p>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- Right column -->
+                <div class="admin-right-col">
+                    <!-- Listing type breakdown -->
+                    <section class="admin-section admin-type-section">
+                        <div class="admin-section-header">
+                            <h2><i data-lucide="pie-chart"></i> Listings by Type</h2>
+                        </div>
+                        {% if type_counts %}
+                        <div class="type-breakdown">
+                            {% for tc in type_counts %}
+                            <div class="type-row">
+                                <span class="filter-dot {{ tc.listing_type }}"></span>
+                                <span class="type-label">{{ tc.label }}</span>
+                                <div class="type-bar-wrap">
+                                    <div class="type-bar type-{{ tc.listing_type }}"
+                                         style="width: {% widthratio tc.total listings_count 100 %}%"></div>
+                                </div>
+                                <span class="type-count">{{ tc.total }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </section>
+
+                    <!-- Recent users -->
+                    <section class="admin-section">
+                        <div class="admin-section-header">
+                            <h2><i data-lucide="users"></i> Recent Users</h2>
+                            <a href="/admin/listings/user/" class="admin-view-all">View all →</a>
+                        </div>
+                        <div class="admin-user-list">
+                            {% for u in recent_users %}
+                            <div class="admin-user-row">
+                                <div class="admin-user-avatar">{{ u.avatar_initials|default:"U" }}</div>
+                                <div class="admin-user-info">
+                                    <strong>{{ u.get_display_name }}</strong>
+                                    <small>{{ u.email }}</small>
+                                </div>
+                                <div class="admin-user-badges">
+                                    {% if not u.is_active %}<span class="ubadge suspended">Suspended</span>{% endif %}
+                                </div>
+                                <div class="admin-user-actions">
+                                    {% if u.is_active and not u.is_staff %}
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="suspend_user">
+                                        <input type="hidden" name="target_id" value="{{ u.pk }}">
+                                        <button class="btn-tiny-danger" type="submit"
+                                                onclick="return confirm('Suspend {{ u.email }}?')">Suspend</button>
+                                    </form>
+                                    {% elif not u.is_active %}
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="activate_user">
+                                        <input type="hidden" name="target_id" value="{{ u.pk }}">
+                                        <button class="btn-tiny-primary" type="submit">Activate</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Recent listings moderation -->
+            <section class="admin-section">
+                <div class="admin-section-header">
+                    <h2><i data-lucide="package"></i> Latest Listings (Moderation)</h2>
+                    <a href="/admin/listings/listing/" class="admin-view-all">View all →</a>
+                </div>
+                <div class="admin-listing-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Seller</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in recent_listings %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'listing-detail' l.pk %}" class="admin-listing-title">
+                                        {{ l.title|truncatechars:35 }}
+                                    </a>
+                                </td>
+                                <td>{{ l.owner.get_display_name }}</td>
+                                <td><span class="filter-dot {{ l.listing_type }}"></span> {{ l.get_listing_type_display }}</td>
+                                <td><span class="req-status status-{{ l.status }}">{{ l.get_status_display }}</span></td>
+                                <td>{{ l.created_at|date:"M j" }}</td>
+                                <td class="admin-row-actions">
+                                    <a href="{% url 'listing-detail' l.pk %}" class="btn-tiny-outline">View</a>
+                                    {% if l.status != 'unavailable' %}
+                                    <form method="post" style="display:inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="remove_listing">
+                                        <input type="hidden" name="target_id" value="{{ l.pk }}">
+                                        <button class="btn-tiny-danger" type="submit"
+                                                onclick="return confirm('Remove this listing?')">Remove</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}

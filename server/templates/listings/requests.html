@@ -1,2 +1,216 @@
-{% extends "listings/base.html" %}
-{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Marketplace activity</p><h1>Requests</h1><p>Track requests you sent and manage requests on your listings.</p></div><div class="request-columns"><section><h2>My requests</h2>{% for item in submitted %}<article class="request-card"><strong>{{ item.listing.title }}</strong><span>{{ item.get_status_display }} · {{ item.created_at|date:"M j, Y" }}</span>{% if item.status == 'pending' %}<form method="post" action="{% url 'request-action' item.pk 'cancel' %}">{% csrf_token %}<button class="text-button" type="submit">Cancel</button></form>{% endif %}{% if item.status == 'completed' and not item.rating %}<form class="review-form" method="post" action="{% url 'review-request' item.pk %}">{% csrf_token %}<select name="rating" required><option value="">Rate seller</option>{% for number in "12345" %}<option value="{{ number }}">{{ number }}/5</option>{% endfor %}</select><input name="review_text" placeholder="Write a review"><button class="primary-button" type="submit">Submit review</button></form>{% endif %}</article>{% empty %}<div class="empty-state">You have not sent any requests.</div>{% endfor %}</section><section><h2>Received requests</h2>{% for item in received %}<article class="request-card"><strong>{{ item.listing.title }}</strong><span>From {{ item.requester.get_full_name|default:item.requester.username }} · {{ item.get_status_display }}</span>{% if item.status == 'pending' %}<form method="post" action="{% url 'request-action' item.pk 'accept' %}">{% csrf_token %}<button class="primary-button" type="submit">Accept</button></form><form method="post" action="{% url 'request-action' item.pk 'reject' %}">{% csrf_token %}<button class="text-button" type="submit">Reject</button></form>{% elif item.status == 'accepted' %}<form method="post" action="{% url 'request-action' item.pk 'complete' %}">{% csrf_token %}<button class="primary-button" type="submit">Mark completed</button></form>{% endif %}</article>{% empty %}<div class="empty-state">No requests received yet.</div>{% endfor %}</section></div></main>{% endblock %}
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Requests · ReFind{% endblock %}
+
+{% block content %}
+
+<main class="form-shell requests-shell">
+    <div class="page-heading">
+        <p class="eyebrow">Marketplace activity</p>
+        <h1>Requests</h1>
+        <p>Track requests you sent and manage requests on your listings.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="req-tabs" role="tablist">
+        <a href="?tab=sent"
+           class="req-tab {% if tab == 'sent' or not tab %}active{% endif %}"
+           role="tab" aria-selected="{% if tab == 'sent' or not tab %}true{% else %}false{% endif %}">
+            <i data-lucide="send"></i> Sent Requests
+            <span class="tab-count">{{ submitted.count }}</span>
+        </a>
+        <a href="?tab=received"
+           class="req-tab {% if tab == 'received' %}active{% endif %}"
+           role="tab" aria-selected="{% if tab == 'received' %}true{% else %}false{% endif %}">
+            <i data-lucide="inbox"></i> Received Requests
+            <span class="tab-count">{{ received.count }}</span>
+        </a>
+    </div>
+
+    <!-- Sent requests tab -->
+    <div class="req-panel {% if tab == 'sent' or not tab %}active{% endif %}" id="panel-sent" role="tabpanel">
+        {% if submitted %}
+        <div class="request-list">
+            {% for item in submitted %}
+            <article class="request-card">
+                <div class="req-card-image">
+                    <a href="{% url 'listing-detail' item.listing.pk %}">
+                        <img src="{{ item.listing.image_url }}" alt="{{ item.listing.title }}">
+                    </a>
+                </div>
+                <div class="req-card-body">
+                    <div class="req-card-top">
+                        <div>
+                            <span class="req-type-badge type-{{ item.listing.listing_type }}">
+                                {% if item.listing.listing_type == 'sell' %}<i data-lucide="shopping-bag"></i> Buy Request
+                                {% elif item.listing.listing_type == 'exchange' %}<i data-lucide="repeat-2"></i> Exchange Request
+                                {% else %}<i data-lucide="gift"></i> Donation Request{% endif %}
+                            </span>
+                            <h3><a href="{% url 'listing-detail' item.listing.pk %}">{{ item.listing.title }}</a></h3>
+                            <p class="req-seller">Seller: <strong>{{ item.listing.owner.get_display_name }}</strong></p>
+                        </div>
+                        <div class="req-meta">
+                            <span class="req-status status-{{ item.status }}">{{ item.get_status_display }}</span>
+                            <time>{{ item.created_at|date:"M j, Y" }}</time>
+                        </div>
+                    </div>
+
+                    {% if item.message %}
+                    <p class="req-message">"{{ item.message }}"</p>
+                    {% endif %}
+
+                    {% if item.offered_listing %}
+                    <div class="req-offered">
+                        <i data-lucide="repeat-2"></i>
+                        Offering: <a href="{% url 'listing-detail' item.offered_listing.pk %}">{{ item.offered_listing.title }}</a>
+                    </div>
+                    {% endif %}
+
+                    <div class="req-card-actions">
+                        <a class="btn-small-outline" href="{% url 'start-conversation' item.listing.pk %}">
+                            <i data-lucide="message-square"></i> Message Seller
+                        </a>
+
+                        {% if item.status == 'pending' %}
+                        <form method="post" action="{% url 'request-action' item.pk 'cancel' %}">
+                            {% csrf_token %}
+                            <button class="btn-small-danger" type="submit"
+                                    onclick="return confirm('Cancel this request?')">
+                                <i data-lucide="x"></i> Cancel Request
+                            </button>
+                        </form>
+                        {% elif item.status == 'accepted' %}
+                        <form method="post" action="{% url 'request-action' item.pk 'complete' %}">
+                            {% csrf_token %}
+                            <button class="btn-small-primary" type="submit">
+                                <i data-lucide="check"></i> Mark Completed
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'request-action' item.pk 'cancel' %}">
+                            {% csrf_token %}
+                            <button class="btn-small-danger" type="submit"
+                                    onclick="return confirm('Cancel this accepted request? The listing will become available again.')">
+                                <i data-lucide="x"></i> Cancel
+                            </button>
+                        </form>
+                        {% elif item.status == 'completed' and not item.rating %}
+                        <details class="review-details">
+                            <summary class="btn-small-outline">
+                                <i data-lucide="star"></i> Rate Seller
+                            </summary>
+                            <form class="review-form-panel" method="post" action="{% url 'review-request' item.pk %}">
+                                {% csrf_token %}
+                                <div class="star-rating-input" role="group" aria-label="Rating">
+                                    {% for n in "54321" %}
+                                    <label class="star-label">
+                                        <input type="radio" name="rating" value="{{ n }}" required>
+                                        <i data-lucide="star"></i>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                                <textarea name="review_text" rows="2" placeholder="Write a review (optional)…" class="review-textarea"></textarea>
+                                <button class="btn-small-primary" type="submit">Submit Rating</button>
+                            </form>
+                        </details>
+                        {% elif item.status == 'completed' and item.rating %}
+                        <div class="submitted-rating">
+                            <i data-lucide="star"></i>
+                            You rated {{ item.listing.owner.get_display_name }} {{ item.rating }}/5
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i data-lucide="send"></i>
+            <p>You haven't sent any requests yet.</p>
+            <a class="btn-primary" href="{% url 'home' %}">Browse listings</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Received requests tab -->
+    <div class="req-panel {% if tab == 'received' %}active{% endif %}" id="panel-received" role="tabpanel">
+        {% if received %}
+        <div class="request-list">
+            {% for item in received %}
+            <article class="request-card">
+                <div class="req-card-image">
+                    <a href="{% url 'listing-detail' item.listing.pk %}">
+                        <img src="{{ item.listing.image_url }}" alt="{{ item.listing.title }}">
+                    </a>
+                </div>
+                <div class="req-card-body">
+                    <div class="req-card-top">
+                        <div>
+                            <span class="req-type-badge type-{{ item.listing.listing_type }}">
+                                {% if item.listing.listing_type == 'sell' %}<i data-lucide="shopping-bag"></i> Purchase Request
+                                {% elif item.listing.listing_type == 'exchange' %}<i data-lucide="repeat-2"></i> Exchange Proposal
+                                {% else %}<i data-lucide="gift"></i> Donation Request{% endif %}
+                            </span>
+                            <h3>
+                                From <strong>{{ item.requester.get_display_name }}</strong>
+                                for <a href="{% url 'listing-detail' item.listing.pk %}">{{ item.listing.title }}</a>
+                            </h3>
+                        </div>
+                        <div class="req-meta">
+                            <span class="req-status status-{{ item.status }}">{{ item.get_status_display }}</span>
+                            <time>{{ item.created_at|date:"M j, Y" }}</time>
+                        </div>
+                    </div>
+
+                    {% if item.message %}
+                    <p class="req-message">"{{ item.message }}"</p>
+                    {% endif %}
+
+                    {% if item.offered_listing %}
+                    <div class="req-offered">
+                        <i data-lucide="repeat-2"></i>
+                        They are offering: <a href="{% url 'listing-detail' item.offered_listing.pk %}">{{ item.offered_listing.title }}</a>
+                        ({{ item.offered_listing.price_label }})
+                    </div>
+                    {% endif %}
+
+                    <div class="req-card-actions">
+                        <a class="btn-small-outline" href="{% url 'message-thread' item.listing.pk item.requester.pk %}">
+                            <i data-lucide="message-square"></i> Message
+                        </a>
+
+                        {% if item.status == 'pending' %}
+                        <form method="post" action="{% url 'request-action' item.pk 'accept' %}">
+                            {% csrf_token %}
+                            <button class="btn-small-primary" type="submit">
+                                <i data-lucide="check"></i> Accept
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'request-action' item.pk 'reject' %}">
+                            {% csrf_token %}
+                            <button class="btn-small-danger" type="submit">
+                                <i data-lucide="x"></i> Reject
+                            </button>
+                        </form>
+                        {% elif item.status == 'accepted' %}
+                        <form method="post" action="{% url 'request-action' item.pk 'complete' %}">
+                            {% csrf_token %}
+                            <button class="btn-small-primary" type="submit">
+                                <i data-lucide="check-check"></i> Mark Completed
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i data-lucide="inbox"></i>
+            <p>No requests received yet.</p>
+            <a class="btn-primary" href="{% url 'listing-create' %}">Create a listing</a>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

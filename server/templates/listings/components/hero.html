@@ -1,22 +1,52 @@
-<section class="hero">
+<section class="hero" aria-label="Campus marketplace introduction">
     <div class="hero-waves" aria-hidden="true"></div>
     <div class="hero-copy">
-        <h1>Find · Buy · Sell · Exchange · Donate</h1>
-        <p>Pre-owned items within your campus on <em>ReFind.</em></p>
+        <p class="hero-eyebrow"><i data-lucide="leaf"></i> Campus · Local · Sustainable</p>
+        <h1>Find · Buy · Sell<br><span class="hero-accent">Exchange · Donate</span></h1>
+        <p class="hero-sub">Pre-owned items within your campus on <em>ReFind.</em></p>
         <div class="hero-chips">
-            <span><i data-lucide="shield-check"></i> Verified Students</span>
-            <span><i data-lucide="leaf"></i> Affordable Deals</span>
+            <span><i data-lucide="shield-check"></i> Student Community</span>
+            <span><i data-lucide="tag"></i> Affordable Deals</span>
             <span><i data-lucide="recycle"></i> Sustainable Campus</span>
         </div>
         <div class="hero-actions">
-            <a class="primary-button" href="{% url 'listing-create' %}"><i data-lucide="plus-square"></i>List an Item</a>
-            <a class="secondary-button" href="#how-it-works"><i data-lucide="circle-help"></i>How it Works</a>
+            <a class="btn-primary" href="{% url 'listing-create' %}">
+                <i data-lucide="plus"></i> List an Item
+            </a>
+            <a class="btn-secondary" href="#how-it-works">
+                <i data-lucide="circle-help"></i> How It Works
+            </a>
         </div>
     </div>
-    <div class="hero-art">
+    <div class="hero-art" aria-hidden="true">
         <div class="campus-photo"></div>
         <div class="give-card">
             <strong>Give<br>Items a<br>Second<br>Life ♻</strong>
+        </div>
+    </div>
+</section>
+
+<section id="how-it-works" class="how-it-works" aria-label="How ReFind works">
+    <div class="how-inner">
+        <div class="how-step">
+            <span class="how-icon"><i data-lucide="user-round-check"></i></span>
+            <strong>1. Create your account</strong>
+            <p>Sign up with any email to join the campus marketplace community.</p>
+        </div>
+        <div class="how-step">
+            <span class="how-icon"><i data-lucide="package-plus"></i></span>
+            <strong>2. List or browse items</strong>
+            <p>Post what you want to sell, exchange, or donate, or browse what others have listed.</p>
+        </div>
+        <div class="how-step">
+            <span class="how-icon"><i data-lucide="message-square"></i></span>
+            <strong>3. Connect and negotiate</strong>
+            <p>Message sellers, send requests, and arrange an on-campus meeting.</p>
+        </div>
+        <div class="how-step">
+            <span class="how-icon"><i data-lucide="handshake"></i></span>
+            <strong>4. Complete the exchange</strong>
+            <p>Meet on campus, hand over the item, and mark it done. Rate your experience.</p>
         </div>
     </div>
 </section>

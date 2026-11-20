@@ -1,0 +1,141 @@
+/**
+ * ReFind design tokens
+ * Brand: forest green marketplace · Motion language inspired by Antigravity restraint
+ * License note: Google Sans Flex / Google Sans Code are loaded from Google Fonts (OFL).
+ */
+
+:root {
+  /* Brand */
+  --green: #087b44;
+  --green-dark: #065f35;
+  --green-light: #10a05a;
+  --green-soft: #eef7f1;
+  --green-tint: #f2fbf5;
+  --mint: #d1f0dc;
+
+  --ink: #121317;
+  --ink-2: #2e3a31;
+  --ink-3: #45474d;
+  --ink-muted: #6b7c70;
+  --ink-faint: #98a89e;
+
+  --line: #e3ebe4;
+  --line-soft: #f0f4f1;
+
+  --bg: #f8fbf8;
+  --surface: #ffffff;
+  --surface-2: #f4f8f4;
+
+  --hero-grad: linear-gradient(105deg, #f6fbf5 0%, #e8f5ec 55%, #cce5d5 100%);
+  --hero-fade: rgba(230, 245, 232, 0.88);
+  --give-card-bg: #fff2a9;
+  --give-card-ink: #2e3a31;
+
+  --sell-color: #087a42;
+  --exchange-color: #1878a3;
+  --donate-color: #7f54b3;
+
+  --success: #087b44;
+  --warning: #b8860b;
+  --danger: #d93025;
+  --danger-soft: #fff0ef;
+
+  /* Shape */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 3px rgba(20, 50, 30, 0.06);
+  --shadow-sm: 0 2px 8px rgba(20, 50, 30, 0.08);
+  --shadow: 0 4px 16px rgba(20, 50, 30, 0.1);
+  --shadow-lg: 0 8px 32px rgba(20, 50, 30, 0.13);
+  --shadow-hover: 0 10px 28px rgba(8, 123, 68, 0.14);
+
+  /* Layout */
+  --header-h: 64px;
+  --page-pad: clamp(16px, 4vw, 42px);
+  --content-max: 1280px;
+
+  /* Typography families (Antigravity-aligned, ReFind-branded) */
+  --font-body: 'Google Sans Flex', 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Google Sans Flex', 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Google Sans Code', ui-monospace, 'Cascadia Code', 'Segoe UI Mono', Consolas, monospace;
+
+  /* Type scale */
+  --text-hero: clamp(2.25rem, 5.2vw, 4.25rem);
+  --text-page: clamp(1.75rem, 3.6vw, 2.75rem);
+  --text-section: clamp(1.35rem, 2.4vw, 2rem);
+  --text-card: clamp(1.05rem, 1.4vw, 1.25rem);
+  --text-body: clamp(0.9375rem, 1.1vw, 1.0625rem);
+  --text-label: 0.8125rem;
+  --text-meta: 0.75rem;
+
+  --leading-tight: 1.12;
+  --leading-snug: 1.35;
+  --leading-body: 1.55;
+  --tracking-tight: -0.03em;
+  --tracking-display: -0.035em;
+  --tracking-label: 0.02em;
+
+  /* Motion tokens (Antigravity-inspired, restrained) */
+  --motion-instant: 100ms;
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-emphasis: 300ms;
+  --motion-slow: 500ms;
+  --motion-ambient: 2000ms;
+
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-soft: cubic-bezier(0.2, 0, 0, 1);
+
+  --transition: var(--motion-base) var(--ease-soft);
+  --transition-fast: var(--motion-fast) var(--ease-standard);
+  --transition-emphasis: var(--motion-emphasis) var(--ease-emphasized);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --green: #3dd68c;
+  --green-dark: #2db87a;
+  --green-light: #5ee0a3;
+  --green-soft: #163528;
+  --green-tint: #132820;
+  --mint: #1e3d2e;
+
+  --ink: #eef5f0;
+  --ink-2: #d5e0d8;
+  --ink-3: #a8b8ae;
+  --ink-muted: #8a9b90;
+  --ink-faint: #667870;
+
+  --line: #2a3830;
+  --line-soft: #1f2a24;
+
+  --bg: #0f1411;
+  --surface: #171d19;
+  --surface-2: #1c2420;
+
+  --hero-grad: linear-gradient(105deg, #121a15 0%, #163022 55%, #1a3a28 100%);
+  --hero-fade: rgba(15, 20, 17, 0.88);
+  --give-card-bg: #2a3d28;
+  --give-card-ink: #eef5f0;
+
+  --sell-color: #3dd68c;
+  --exchange-color: #5eb8e0;
+  --donate-color: #b894e0;
+
+  --danger: #ff6b5e;
+  --danger-soft: #3a1f1c;
+
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 12px 32px rgba(61, 214, 140, 0.12);
+}

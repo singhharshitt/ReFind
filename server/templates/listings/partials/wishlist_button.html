@@ -1,0 +1,8 @@
+<button class="favorite-button {% if saved %}saved{% endif %}"
+        type="button"
+        aria-label="{% if saved %}Remove from{% else %}Add to{% endif %} wishlist"
+        hx-post="{% url 'toggle-wishlist' listing.id %}"
+        hx-swap="outerHTML"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <i data-lucide="heart"></i>
+</button>

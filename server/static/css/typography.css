@@ -1,0 +1,139 @@
+/**
+ * ReFind typography — Google Sans Flex primary, Google Sans Code for technical IDs
+ */
+
+html {
+  font-family: var(--font-body);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body.rf-body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  letter-spacing: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+.hero-copy h1,
+.auth-brand-copy h1,
+.page-heading h1 {
+  font-size: var(--text-hero);
+  font-weight: 650;
+  letter-spacing: var(--tracking-display);
+  font-variation-settings: 'opsz' 72, 'wght' 650;
+}
+
+.page-heading h1,
+.detail-copy h1 {
+  font-size: var(--text-page);
+  font-variation-settings: 'opsz' 48, 'wght' 650;
+}
+
+.admin-topbar h1,
+.inbox-header h1,
+.wishlist-header h1 {
+  font-size: var(--text-section);
+  font-weight: 650;
+}
+
+.listing-body h3,
+.my-listing-body h3,
+.req-card-body h3,
+.how-step strong,
+.form-tips h2,
+.admin-section-header h2,
+.dropdown-header strong,
+.conv-name-row strong,
+.profile-name {
+  font-family: var(--font-body);
+  font-size: var(--text-card);
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  font-variation-settings: 'opsz' 18, 'wght' 650;
+}
+
+.eyebrow,
+.hero-eyebrow {
+  font-size: var(--text-meta);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variation-settings: 'opsz' 14, 'wght' 700;
+}
+
+.nav-link,
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.btn-danger,
+.primary-button,
+.auth-primary {
+  font-variation-settings: 'opsz' 16, 'wght' 650;
+  letter-spacing: -0.01em;
+}
+
+.rf-mono,
+.transaction-id,
+.admin-row-meta,
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.brand-name {
+  font-family: var(--font-heading);
+  font-variation-settings: 'opsz' 28, 'wght' 750;
+  letter-spacing: -0.04em;
+}
+
+/* Text reveal (hero) */
+.rf-reveal {
+  display: inline;
+}
+.rf-reveal-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.35em);
+  will-change: opacity, transform;
+}
+.rf-reveal.is-done .rf-reveal-char {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+.rf-reveal-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.9em;
+  margin-left: 2px;
+  vertical-align: -0.05em;
+  background: var(--green);
+  border-radius: 1px;
+  animation: rf-cursor-blink 0.9s steps(1) infinite;
+}
+.rf-reveal.is-done .rf-reveal-cursor {
+  opacity: 0;
+  animation: none;
+  transition: opacity var(--motion-fast) var(--ease-exit);
+}
+
+@keyframes rf-cursor-blink {
+  0%, 45% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}

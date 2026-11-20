@@ -1,19 +1,51 @@
 <div class="search-row">
     <form class="search-box"
-          hx-get="{% url 'home' %}" hx-trigger="submit"
-          hx-target="#listing-grid" hx-push-url="true">
-        <i data-lucide="search"></i>
-        <input name="q" value="{{ request.GET.q }}" type="search" placeholder="Search for books, laptops, cycle, etc..."
-               aria-label="Search listings">
-        <button type="submit">Ctrl K</button>
+          hx-get="{% url 'home' %}"
+          hx-trigger="submit, keyup[key=='Enter']"
+          hx-target="#listing-grid"
+          hx-push-url="true"
+          hx-include="#filters-form"
+          role="search">
+        <i data-lucide="search" aria-hidden="true"></i>
+        <input name="q"
+               value="{{ request.GET.q }}"
+               type="search"
+               placeholder="Search for books, laptops, cycle, etc…"
+               aria-label="Search listings"
+               autocomplete="off">
+        <button type="submit" class="search-kbd-hint" aria-label="Search">
+            <span>Search</span>
+        </button>
     </form>
-    <nav class="category-quick" aria-label="Popular categories">
-        <a href="{% url 'home' %}"><i data-lucide="layout-grid"></i><span>All Categories</span></a>
-        <a href="{% url 'home' %}?category=books"><i data-lucide="book-open"></i><span>Books</span></a>
-        <a href="{% url 'home' %}?category=electronics"><i data-lucide="laptop"></i><span>Electronics</span></a>
-        <a href="{% url 'home' %}?category=furniture"><i data-lucide="armchair"></i><span>Furniture</span></a>
-        <a href="{% url 'home' %}?category=sports"><i data-lucide="dumbbell"></i><span>Sports</span></a>
-        <a href="{% url 'home' %}?category=essentials"><i data-lucide="shirt"></i><span>Essentials</span></a>
-        <a href="#"><span>•••</span><span>More</span></a>
+
+    <nav class="category-quick" aria-label="Browse by category">
+        <a href="{% url 'home' %}"
+           class="cat-link{% if not request.GET.category and not request.GET.kind %} active{% endif %}">
+            <i data-lucide="layout-grid"></i><span>All</span>
+        </a>
+        <a href="{% url 'home' %}?category=books"
+           class="cat-link{% if request.GET.category == 'books' %} active{% endif %}">
+            <i data-lucide="book-open"></i><span>Books</span>
+        </a>
+        <a href="{% url 'home' %}?category=electronics"
+           class="cat-link{% if request.GET.category == 'electronics' %} active{% endif %}">
+            <i data-lucide="laptop"></i><span>Electronics</span>
+        </a>
+        <a href="{% url 'home' %}?category=furniture"
+           class="cat-link{% if request.GET.category == 'furniture' %} active{% endif %}">
+            <i data-lucide="armchair"></i><span>Furniture</span>
+        </a>
+        <a href="{% url 'home' %}?category=cycles"
+           class="cat-link{% if request.GET.category == 'cycles' %} active{% endif %}">
+            <i data-lucide="bike"></i><span>Cycles</span>
+        </a>
+        <a href="{% url 'home' %}?category=sports"
+           class="cat-link{% if request.GET.category == 'sports' %} active{% endif %}">
+            <i data-lucide="dumbbell"></i><span>Sports</span>
+        </a>
+        <a href="{% url 'home' %}?category=essentials"
+           class="cat-link{% if request.GET.category == 'essentials' %} active{% endif %}">
+            <i data-lucide="shirt"></i><span>Essentials</span>
+        </a>
     </nav>
 </div>

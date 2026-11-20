@@ -1,2 +1,106 @@
-{% extends "listings/base.html" %}
-{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Your account</p><h1>Profile</h1><p>Keep your campus details up to date.</p></div><form class="listing-form" method="post">{% csrf_token %}{{ form.as_p }}<button class="primary-button" type="submit">Save profile</button></form><a class="text-button" href="{% url 'logout' %}">Log out</a></main>{% endblock %}
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Profile · ReFind{% endblock %}
+
+{% block content %}
+
+<main class="form-shell profile-shell">
+    <div class="profile-layout">
+
+        <!-- Left: avatar + stats -->
+        <aside class="profile-sidebar">
+            <div class="profile-avatar-wrap">
+                {% if user.avatar %}
+                <img class="profile-avatar-img" src="{{ user.avatar.url }}" alt="{{ user.get_display_name }}">
+                {% else %}
+                <div class="profile-avatar-initials">{{ user.avatar_initials|default:"U" }}</div>
+                {% endif %}
+            </div>
+            <h2 class="profile-name">{{ user.get_display_name }}</h2>
+            <p class="profile-email">{{ user.email }}</p>
+            <p class="profile-join">Member since {{ user.date_joined|date:"M Y" }}</p>
+
+            <div class="profile-stats">
+                <div class="pstat">
+                    <strong>{{ listings_count }}</strong>
+                    <span>Listings</span>
+                </div>
+                <div class="pstat">
+                    <strong>{{ completed_count }}</strong>
+                    <span>Deals</span>
+                </div>
+                <div class="pstat">
+                    <strong>{% if avg_rating %}{{ avg_rating }}{% else %}–{% endif %}</strong>
+                    <span>Rating</span>
+                </div>
+            </div>
+
+            <nav class="profile-nav">
+                <a href="{% url 'my-listings' %}"><i data-lucide="package"></i> My Listings</a>
+                <a href="{% url 'wishlist' %}"><i data-lucide="heart"></i> Wishlist</a>
+                <a href="{% url 'requests-dashboard' %}"><i data-lucide="repeat-2"></i> Requests</a>
+                <a href="{% url 'inbox' %}"><i data-lucide="message-square"></i> Messages</a>
+                {% if user.is_staff or user.role == 'admin' %}
+                <a href="{% url 'admin-dashboard' %}"><i data-lucide="layout-dashboard"></i> Admin Dashboard</a>
+                {% endif %}
+                <div class="pnav-divider"></div>
+                <a href="{% url 'logout' %}" class="logout-link"><i data-lucide="log-out"></i> Log Out</a>
+            </nav>
+        </aside>
+
+        <!-- Right: edit form -->
+        <div class="profile-form-card">
+            <h2>Edit Profile</h2>
+            <p class="profile-form-sub">Keep your campus details up to date.</p>
+
+            <form class="listing-form profile-form" method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                <div class="form-two-col">
+                    <div class="form-field">
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
+                        {% for e in form.first_name.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
+                        {% for e in form.last_name.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                    </div>
+                </div>
+                <div class="form-two-col">
+                    <div class="form-field">
+                        <label for="{{ form.phone.id_for_label }}">Phone</label>
+                        {{ form.phone }}
+                        {% for e in form.phone.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ form.hostel.id_for_label }}">Hostel / Room</label>
+                        {{ form.hostel }}
+                        {% for e in form.hostel.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label for="{{ form.bio.id_for_label }}">Bio</label>
+                    {{ form.bio }}
+                    {% for e in form.bio.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                </div>
+                <div class="form-field">
+                    <label for="{{ form.avatar.id_for_label }}">Profile Picture</label>
+                    {% if user.avatar %}
+                    <img class="current-avatar-preview" src="{{ user.avatar.url }}" alt="Current avatar">
+                    {% endif %}
+                    {{ form.avatar }}
+                    {% for e in form.avatar.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+                </div>
+
+                <div class="form-submit-row">
+                    <a class="btn-outline" href="{% url 'password_reset' %}">Change Password</a>
+                    <button class="btn-primary" type="submit">
+                        <i data-lucide="save"></i> Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,14 @@
+<a class="brand{% if brand_class %} {{ brand_class }}{% endif %}"
+   href="{% url 'home' %}"
+   {% if close_nav %}data-close-mobile-nav{% endif %}
+   aria-label="ReFind home">
+    <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 34 34" fill="none">
+            <path d="M7 27C5 18 9 8 22 5c-1 12-5 19-15 22Z" stroke="currentColor" stroke-width="3"/>
+            <path d="M12 23c5-7 10-11 17-13" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+    </span>
+    <span class="brand-wordmark">
+        <span class="brand-name">ReFind</span>
+    </span>
+</a>

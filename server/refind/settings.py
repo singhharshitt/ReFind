@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'listings.context_processors.nav_badges',
             ],
         },
     },
@@ -96,6 +97,8 @@ database_uri = None if os.getenv('REFIND_USE_POSTGRES', '1').lower() == '0' else
 )
 if database_uri:
     parsed_database = urlparse(database_uri)
+    # Build OPTIONS from URI query string (e.g. sslmode, channel_binding)
+    uri_options = {key: values[-1] for key, values in parse_qs(parsed_database.query).items()}
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -103,8 +106,13 @@ if database_uri:
             'USER': unquote(parsed_database.username or ''),
             'PASSWORD': unquote(parsed_database.password or ''),
             'HOST': parsed_database.hostname,
-            'PORT': parsed_database.port or '',
-            'OPTIONS': {key: values[-1] for key, values in parse_qs(parsed_database.query).items()},
+            'PORT': str(parsed_database.port or 5432),
+            'OPTIONS': uri_options,
+            # Tell manage.py dbshell where psql lives on Windows
+            'PGBINDIR': os.getenv(
+                'PGBINDIR',
+                r'C:\Program Files\PostgreSQL\18\bin',
+            ),
         }
     }
 else:
@@ -145,8 +153,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/auth/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Media files (uploaded images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Email
@@ -158,4 +177,5 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@refind.campus')
 CAMPUS_EMAIL_DOMAIN = os.getenv('CAMPUS_EMAIL_DOMAIN', 'ipu.in')

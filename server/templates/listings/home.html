@@ -1,36 +1,56 @@
-{% extends "listings/base.html" %}
+{% extends "listings/layouts/main_layout.html" %}
+
+{% block title %}ReFind – Campus Marketplace{% endblock %}
 
 {% block content %}
-    {% include "listings/components/header.html" %}
-    {% include "listings/components/hero.html" %}
+{% include "listings/components/hero.html" %}
 
-    <main class="marketplace-shell">
-        {% include "listings/components/search_bar.html" %}
-        {% include "listings/components/category_nav.html" %}
+<main class="marketplace-shell">
+    {% include "listings/components/search_bar.html" %}
 
-        <div class="content-grid">
+    <button type="button" class="mobile-filters-toggle" id="mobile-filters-toggle">
+        <i data-lucide="sliders-horizontal"></i> Filters
+    </button>
+    <div class="mobile-filters-backdrop" id="mobile-filters-backdrop"></div>
+
+    <div class="content-grid">
+        <div id="mobile-filters" class="filters-drawer-host">
             {% include "listings/components/filter_sidebar.html" %}
-            <section class="listings-area">
-                <div class="results-toolbar">
-                    <strong><span id="listing-count">{{ listing_count }}</span> Listings Found</strong>
-                    <div class="toolbar-actions">
-                        <form>
-                            <label for="sort">Sort by:</label>
-                            <select id="sort" name="sort"
-                                    hx-get="{% url 'home' %}" hx-trigger="change"
-                                    hx-target="#listing-grid" hx-push-url="true">
-                                <option value="newest">Newest First</option>
-                                <option value="price-low">Price: Low to High</option>
-                            </select>
-                        </form>
-                        <button class="view-button active" type="button" aria-label="Grid view"><i data-lucide="grid-2x2"></i></button>
-                        <button class="view-button" type="button" aria-label="List view"><i data-lucide="list"></i></button>
-                    </div>
-                </div>
-                <div id="listing-grid">
-                    {% include "listings/partials/listing_grid.html" %}
-                </div>
-            </section>
         </div>
-    </main>
+
+        <section class="listings-area" aria-label="Product listings">
+            <div class="results-toolbar">
+                <strong id="listing-count-label">
+                    <span id="listing-count">{{ listing_count }}</span>
+                    Listing{{ listing_count|pluralize }} Found
+                </strong>
+                <div class="toolbar-actions">
+                    <form id="sort-form">
+                        {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+                        {% if request.GET.kind %}<input type="hidden" name="kind" value="{{ request.GET.kind }}">{% endif %}
+                        {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+                        {% if request.GET.condition %}<input type="hidden" name="condition" value="{{ request.GET.condition }}">{% endif %}
+                        {% if request.GET.min_price %}<input type="hidden" name="min_price" value="{{ request.GET.min_price }}">{% endif %}
+                        {% if request.GET.max_price %}<input type="hidden" name="max_price" value="{{ request.GET.max_price }}">{% endif %}
+                        <label for="sort-select" class="sr-only">Sort by</label>
+                        <select id="sort-select" name="sort"
+                                hx-get="{% url 'home' %}"
+                                hx-trigger="change"
+                                hx-target="#listing-grid"
+                                hx-include="#sort-form"
+                                hx-push-url="true">
+                            <option value="newest" {% if request.GET.sort == 'newest' or not request.GET.sort %}selected{% endif %}>Newest First</option>
+                            <option value="price-low" {% if request.GET.sort == 'price-low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price-high" {% if request.GET.sort == 'price-high' %}selected{% endif %}>Price: High to Low</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            <div id="listing-grid">
+                {% include "listings/partials/listing_grid.html" %}
+            </div>
+        </section>
+    </div>
+</main>
 {% endblock %}

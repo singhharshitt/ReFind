@@ -1,2 +1,35 @@
-{% extends "listings/base.html" %}
-{% block content %}{% include "listings/components/header.html" %}<main class="form-shell"><div class="page-heading"><p class="eyebrow">Keep ReFind safe</p><h1>Report listing</h1><p>{{ listing.title }}</p></div><form class="listing-form" method="post">{% csrf_token %}{{ form.as_p }}<button class="danger-button" type="submit">Submit report</button></form></main>{% endblock %}
+{% extends "listings/layouts/main_layout.html" %}
+{% block title %}Report Listing · ReFind{% endblock %}
+
+{% block content %}
+<main class="form-shell">
+    <div class="page-heading">
+        <p class="eyebrow"><i data-lucide="flag"></i> Safety</p>
+        <h1>Report a Listing</h1>
+        <p>Help us keep ReFind safe for everyone.</p>
+    </div>
+    <div class="report-listing-preview">
+        <img src="{{ listing.image_url }}" alt="{{ listing.title }}">
+        <div>
+            <strong>{{ listing.title }}</strong>
+            <span>{{ listing.get_category_display }} · {{ listing.price_label }}</span>
+        </div>
+    </div>
+    <form class="listing-form" method="post" style="max-width:580px">
+        {% csrf_token %}
+        <div class="form-field">
+            <label for="{{ form.reason.id_for_label }}">
+                What is wrong with this listing? <span class="required">*</span>
+            </label>
+            {{ form.reason }}
+            {% for e in form.reason.errors %}<small class="form-error">{{ e }}</small>{% endfor %}
+        </div>
+        <div class="form-submit-row">
+            <a class="btn-outline" href="{% url 'listing-detail' listing.pk %}">Cancel</a>
+            <button class="btn-primary" type="submit">
+                <i data-lucide="send"></i> Submit Report
+            </button>
+        </div>
+    </form>
+</main>
+{% endblock %}
